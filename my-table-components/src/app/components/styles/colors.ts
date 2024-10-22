@@ -1,0 +1,17 @@
+export const azure = '#3A53A4';
+export const linkWater = '#D9DFF2';
+export const scooter = '#44C4D8';
+export const jaffa = '#F2994A';
+export const white = '#FFFFFF';
+export const alabaster = '#FBFBFB';
+export const wildSand = '#F6F6F6';
+export const concrete = '#F2F2F2';
+export const gallery = '#EFEFEF';
+export const mercury = '#E9E9E9';
+export const alto = '#E0E0E0';
+export const silver = '#BDBDBD';
+export const manatee = '#97999C';
+export const friarGray = '#7F7F7E';
+export const tundora = '#404040';
+export const thunder = '#221F20';
+export const black = '#000000';
