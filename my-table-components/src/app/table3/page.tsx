@@ -1,7 +1,7 @@
 import Navbar from "../components/navbar/navbar";
 
 
-export default function Table3() {
+export default function Table3Page() {
     return (
         <div className="table-page">
             <Navbar />

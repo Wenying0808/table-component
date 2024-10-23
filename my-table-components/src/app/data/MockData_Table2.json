@@ -1,0 +1,62 @@
+[
+    {
+      "id": "wa1",
+      "name": "Hit Expansion",
+      "status": "Completed",
+      "actions": ["Download", "Archive", "Report"],
+      "updatedTime": "2024-10-20T14:30:00Z",
+      "duration": "2h 30m",
+      "appAnalyses": [
+        {
+          "id": "aa1",
+          "name": "IGX-Profile",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-10-20T12:00:00Z",
+          "duration": "1h 5m"
+        },
+        {
+          "id": "aa2",
+          "name": "IGX-Cluster",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-10-19T16:45:00Z",
+          "duration": "15m"
+        },
+        {
+          "id": "aa3",
+          "name": "IGX-Branch",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-10-19T16:45:00Z",
+          "duration": "35m"
+        }
+      ]
+    },
+    {
+      "id": "wa2",
+      "name": "Hit Selection",
+      "status": "Running",
+      "actions": ["Pause", "Archive"],
+      "updatedTime": "2024-10-21T09:00:00Z",
+      "duration": "2h",
+      "appAnalyses": [
+       {
+          "id": "aa4",
+          "name": "IGX-Profile",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-10-20T12:00:00Z",
+          "duration": "1h"
+        },
+        {
+          "id": "aa5",
+          "name": "IGX-Cluster",
+          "status": "Running",
+          "actions": ["Stop"],
+          "updatedTime": "2024-10-20T12:00:00Z",
+          "duration": ""
+        }
+      ]
+    }
+  ]
