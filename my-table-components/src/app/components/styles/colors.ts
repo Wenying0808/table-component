@@ -1,17 +1,19 @@
-export const azure = '#3A53A4';
-export const linkWater = '#D9DFF2';
-export const scooter = '#44C4D8';
-export const jaffa = '#F2994A';
-export const white = '#FFFFFF';
-export const alabaster = '#FBFBFB';
-export const wildSand = '#F6F6F6';
-export const concrete = '#F2F2F2';
-export const gallery = '#EFEFEF';
-export const mercury = '#E9E9E9';
-export const alto = '#E0E0E0';
-export const silver = '#BDBDBD';
-export const manatee = '#97999C';
-export const friarGray = '#7F7F7E';
-export const tundora = '#404040';
-export const thunder = '#221F20';
-export const black = '#000000';
+export const colors = {
+  azure: '#3A53A4',
+  linkWater: '#D9DFF2',
+  scooter: '#44C4D8',
+  jaffa: '#F2994A',
+  white: '#FFFFFF',
+  alabaster: '#FBFBFB',
+  wildSand: '#F6F6F6',
+  concrete: '#F2F2F2',
+  gallery: '#EFEFEF',
+  mercury: '#E9E9E9',
+  alto: '#E0E0E0',
+  silver: '#BDBDBD',
+  manatee: '#97999C',
+  friarGray: '#7F7F7E',
+  tundora: '#404040',
+  thunder: '#221F20',
+  black: '#000000',
+};

@@ -1,6 +1,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --black: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -86,4 +87,20 @@ a {
   .table-main {
     align-items: center;
   }
+}
+
+table {
+  border: 1px solid gray;
+  background-color: white;
+  width: 80vw;
+  border-radius: 10px;;
+}
+
+th {
+  color: var(--black);
+  text-align: left;
+}
+
+td {
+  color: var(--black);
 }
