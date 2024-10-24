@@ -1,5 +1,6 @@
-import Navbar from "../components/navbar/navbar";
+"use client";
 
+import Navbar from "../components/navbar/navbar";
 
 export default function Table3Page() {
     return (
