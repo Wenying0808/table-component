@@ -1,8 +1,10 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel, Row } from '@tanstack/react-table'
 import table2Data from '../../../data/MockData_Table2.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { colors } from '../../styles/colors';
+import { IconButton } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 
 type BaseAnalysis = {
     id: string;
@@ -20,11 +22,46 @@ type WorkflowAnalysis = BaseAnalysis & {
 }
 
 
-const columnHelper = createColumnHelper<WorkflowAnalysis>();
+
+const TableColumnHeaderRow = ({ children }: { children: React.ReactNode }) => {
+    const rowStyles = {
+        fontWeight: 700,
+        borderBottom: `2px solid ${colors.alto}`,
+        height: "46px",
+    };
+
+    return (
+        <tr style={rowStyles}>
+            {children}
+        </tr>
+    );
+};
+
+const TableRow = ({ row, children }: { row: Row<WorkflowAnalysis>, children: React.ReactNode }) => {
+    const rowStyles = {
+        parentRow: {
+            fontWeight: 600,
+            borderBottom: `1px solid ${colors.alto}`,
+            height: "46px",
+        },
+        childRow: {
+            fontWeight: 500,
+            backgroundColor: `${colors.wildSand}`,
+            height: "34px",
+        },
+    };
+
+    return (
+        <tr style={row.depth === 0 ? rowStyles.parentRow : rowStyles.childRow}>
+            {children}
+        </tr>
+    );
+};
 
 export default function Table2() {
    
     const [data, setData] = useState<WorkflowAnalysis[]>([]);
+    const columnHelper = createColumnHelper<WorkflowAnalysis>();
 
     useEffect(() => {
         setData(table2Data as WorkflowAnalysis[]);
@@ -35,21 +72,11 @@ export default function Table2() {
             id: 'expand',
             cell: ({ row }) => {
                 return (
-                    <div style={{ paddingLeft: "8px" }}>
+                    <div style={{ paddingLeft: "8px", height: "46px", borderLeft: row.depth === 0 ? `4px solid ${colors.azure}` : "none" }}>
                         {row.depth === 0 && row.getCanExpand() ? (
-                            <button 
-                                onClick={() => row.toggleExpanded()}
-                                style={{
-                                    background: colors.azure,
-                                    border: "none",
-                                    borderRadius: "4px",
-                                    cursor: "pointer",
-                                    width: "20px",
-                                    height: "20px"
-                                }}
-                            >
-                                {row.getIsExpanded() ? '−' : '+'}
-                            </button>
+                            <IconButton onClick={() => row.toggleExpanded()} sx={{ color: colors.azure }}>
+                                {row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
+                            </IconButton>
                         ) : null}
                     </div>
                 )
@@ -118,7 +145,7 @@ export default function Table2() {
             <table>
                 <thead>
                 {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
+                    <TableColumnHeaderRow key={headerGroup.id}>
                         {headerGroup.headers.map(header => (
                             <th key={header.id}>
                                 {flexRender(
@@ -127,13 +154,13 @@ export default function Table2() {
                                 )}
                             </th>
                         ))}
-                    </tr>
+                    </TableColumnHeaderRow>
                 ))}
                 </thead>
                 <tbody>
                     {table.getRowModel().rows.map(row => (
                         <React.Fragment key={row.id}>
-                            <tr key={row.id}>
+                            <TableRow key={row.id} row={row}>
                                 {row.getVisibleCells().map(cell => (
                                     <td key={cell.id}>
                                         {flexRender(
@@ -141,20 +168,7 @@ export default function Table2() {
                                             cell.getContext())}
                                     </td>
                                 ))}
-                            </tr>
-                            {/* {row.getIsExpanded() && (
-                                {row.getSubRows().map(subRow => (
-                                    <tr key={subRow.id}>
-                                        {subRow.getVisibleCells().map(cell => (
-                                            <td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            )} */}
+                            </TableRow>
                         </React.Fragment> 
                     ))}
                 </tbody>
