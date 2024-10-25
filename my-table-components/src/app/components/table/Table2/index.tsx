@@ -3,8 +3,10 @@ import table2Data from '../../../data/MockData_Table2.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { colors } from '../../styles/colors';
-import { IconButton } from '@mui/material';
+import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 type BaseAnalysis = {
     id: string;
@@ -57,6 +59,43 @@ const TableRow = ({ row, children }: { row: Row<WorkflowAnalysis>, children: Rea
         </tr>
     );
 };
+
+const TableCellActions = ({ data }: { data: string[]} ) => {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+      };
+      const handleClose = () => {
+        setAnchorEl(null);
+      };
+
+    return (
+        <td>
+            <Button
+                onClick={handleClick}
+                endIcon={open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            >
+                Actions
+            </Button>  
+            <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                }}
+            >
+                {data.map((d, index) => (
+                    <MenuItem key={index} onClick={handleClose}>{d}</MenuItem>
+                ))}
+            </Menu>
+
+        </td>
+    )
+}
 
 export default function Table2() {
    
@@ -116,7 +155,7 @@ export default function Table2() {
             )
         }),
         columnHelper.accessor('actions', {
-            cell: info => info.getValue(),
+            cell: info =><TableCellActions data={info.getValue()} />,
             header: () => (
                 <span className="table-header">
                     Actions
