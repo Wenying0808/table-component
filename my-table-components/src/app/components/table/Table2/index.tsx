@@ -7,6 +7,8 @@ import { Button, IconButton, Menu, MenuItem } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 type BaseAnalysis = {
     id: string;
@@ -22,8 +24,6 @@ type AppAnalysis = BaseAnalysis;
 type WorkflowAnalysis = BaseAnalysis & {
     appAnalyses?: AppAnalysis[];
 }
-
-
 
 const TableColumnHeaderRow = ({ children }: { children: React.ReactNode }) => {
     const rowStyles = {
@@ -74,8 +74,12 @@ const TableCellActions = ({ data }: { data: string[]} ) => {
     return (
         <td>
             <Button
+                variant="outlined"
                 onClick={handleClick}
                 endIcon={open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                sx={{
+                    color: colors.azure,
+                }}
             >
                 Actions
             </Button>  
@@ -114,7 +118,7 @@ export default function Table2() {
                     <div style={{ paddingLeft: "8px", height: "46px", borderLeft: row.depth === 0 ? `4px solid ${colors.azure}` : "none" }}>
                         {row.depth === 0 && row.getCanExpand() ? (
                             <IconButton onClick={() => row.toggleExpanded()} sx={{ color: colors.azure }}>
-                                {row.getIsExpanded() ? <ExpandLess /> : <ExpandMore />}
+                                {row.getIsExpanded() ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                             </IconButton>
                         ) : null}
                     </div>
