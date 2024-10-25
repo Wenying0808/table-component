@@ -1,8 +1,11 @@
 export const colors = {
   azure: '#3A53A4',
   linkWater: '#D9DFF2',
-  scooter: '#44C4D8',
-  jaffa: '#F2994A',
+  salem: '#058F23', // completed
+  moodyBlue: '#768BCE', // quedued
+  scooter: '#44C4D8', // running
+  jaffa: '#F2994A', //warning
+  alizarin: '#E32327', //failed
   white: '#FFFFFF',
   alabaster: '#FBFBFB',
   wildSand: '#F6F6F6',

@@ -101,6 +101,32 @@ const TableCellActions = ({ data }: { data: string[]} ) => {
     )
 }
 
+const TableCellStatus = ({ data }: { data: string }) => {
+
+    const getStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'completed':
+                return colors.salem;
+            case 'failed':
+                return colors.alizarin;
+            case 'running':
+                return colors.scooter;
+            case 'queued':
+                return colors.moodyBlue;
+            default:
+                return colors.black; 
+        }
+    };
+
+    const cellStyles = {
+        color: getStatusColor(data)
+    }
+
+    return (
+        <td style={cellStyles}>{data}</td>
+    )
+}
+
 export default function Table2() {
    
     const [data, setData] = useState<WorkflowAnalysis[]>([]);
@@ -151,7 +177,7 @@ export default function Table2() {
             )
         }),
         columnHelper.accessor('status', {
-            cell: info => info.getValue(),
+            cell: info => <TableCellStatus data={info.getValue()} />,
             header: () => (
                 <span className="table-header">
                     Status
@@ -159,7 +185,7 @@ export default function Table2() {
             )
         }),
         columnHelper.accessor('actions', {
-            cell: info =><TableCellActions data={info.getValue()} />,
+            cell: info => <TableCellActions data={info.getValue()} />,
             header: () => (
                 <span className="table-header">
                     Actions
