@@ -1,14 +1,14 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel, Row } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel } from '@tanstack/react-table'
 import table2Data from '../../../data/MockData_Table2.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
-import { colors } from '../../styles/colors';
-import { Button, IconButton, Menu, MenuItem } from '@mui/material';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
+import { Table2Row } from '../Table2Row';
+import { Table2CellExpand } from '../Table2CellExpand';
+import { TableCellStatus } from '../../table/StatusCell';
+import { TableCellActions } from '../../table/ActionsCell';
+
+
 
 type BaseAnalysis = {
     id: string;
@@ -25,107 +25,8 @@ type WorkflowAnalysis = BaseAnalysis & {
     appAnalyses?: AppAnalysis[];
 }
 
-const TableColumnHeaderRow = ({ children }: { children: React.ReactNode }) => {
-    const rowStyles = {
-        fontWeight: 700,
-        borderBottom: `2px solid ${colors.alto}`,
-        height: "46px",
-    };
 
-    return (
-        <tr style={rowStyles}>
-            {children}
-        </tr>
-    );
-};
 
-const TableRow = ({ row, children }: { row: Row<WorkflowAnalysis>, children: React.ReactNode }) => {
-    const rowStyles = {
-        parentRow: {
-            fontWeight: 600,
-            borderBottom: `1px solid ${colors.alto}`,
-            height: "46px",
-        },
-        childRow: {
-            fontWeight: 500,
-            backgroundColor: `${colors.wildSand}`,
-            height: "34px",
-        },
-    };
-
-    return (
-        <tr style={row.depth === 0 ? rowStyles.parentRow : rowStyles.childRow}>
-            {children}
-        </tr>
-    );
-};
-
-const TableCellActions = ({ data }: { data: string[]} ) => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget);
-      };
-      const handleClose = () => {
-        setAnchorEl(null);
-      };
-
-    return (
-        <td>
-            <Button
-                variant="outlined"
-                onClick={handleClick}
-                endIcon={open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                sx={{
-                    color: colors.azure,
-                }}
-            >
-                Actions
-            </Button>  
-            <Menu
-                id="basic-menu"
-                anchorEl={anchorEl}
-                open={open}
-                onClose={handleClose}
-                MenuListProps={{
-                    'aria-labelledby': 'basic-button',
-                }}
-            >
-                {data.map((d, index) => (
-                    <MenuItem key={index} onClick={handleClose}>{d}</MenuItem>
-                ))}
-            </Menu>
-
-        </td>
-    )
-}
-
-const TableCellStatus = ({ data }: { data: string }) => {
-
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'completed':
-                return colors.salem;
-            case 'failed':
-                return colors.alizarin;
-            case 'running':
-                return colors.scooter;
-            case 'queued':
-                return colors.moodyBlue;
-            default:
-                return colors.black; 
-        }
-    };
-
-    const cellStyles = {
-        color: getStatusColor(data)
-    }
-
-    return (
-        <td style={cellStyles}>{data}</td>
-    )
-}
 
 export default function Table2() {
    
@@ -139,17 +40,7 @@ export default function Table2() {
     const columns = useMemo(() => [
         columnHelper.display({
             id: 'expand',
-            cell: ({ row }) => {
-                return (
-                    <div style={{ paddingLeft: "8px", height: "46px", borderLeft: row.depth === 0 ? `4px solid ${colors.azure}` : "none" }}>
-                        {row.depth === 0 && row.getCanExpand() ? (
-                            <IconButton onClick={() => row.toggleExpanded()} sx={{ color: colors.azure }}>
-                                {row.getIsExpanded() ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                            </IconButton>
-                        ) : null}
-                    </div>
-                )
-            },
+            cell: ({ row }) => <Table2CellExpand row={row} />,
             header: () => <span className="table-header"></span>
         }),
         columnHelper.accessor('id', {
@@ -229,7 +120,7 @@ export default function Table2() {
                 <tbody>
                     {table.getRowModel().rows.map(row => (
                         <React.Fragment key={row.id}>
-                            <TableRow key={row.id} row={row}>
+                            <Table2Row key={row.id} row={row}>
                                 {row.getVisibleCells().map(cell => (
                                     <td key={cell.id}>
                                         {flexRender(
@@ -237,7 +128,7 @@ export default function Table2() {
                                             cell.getContext())}
                                     </td>
                                 ))}
-                            </TableRow>
+                            </Table2Row>
                         </React.Fragment> 
                     ))}
                 </tbody>

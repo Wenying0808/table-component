@@ -2,6 +2,7 @@ import { useReactTable, getCoreRowModel, createColumnHelper, flexRender } from '
 import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
+import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
 
 type Analysis = {
     id: string;
@@ -78,7 +79,7 @@ export default function Table1() {
             <table>
                 <thead>
                 {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
+                    <TableColumnHeaderRow key={headerGroup.id}>
                         {headerGroup.headers.map(header => (
                             <th key={header.id}>
                                 {flexRender(
@@ -87,7 +88,7 @@ export default function Table1() {
                                 )}
                             </th>
                         ))}
-                    </tr>
+                    </TableColumnHeaderRow>
                 ))}
                 </thead>
                 <tbody>
