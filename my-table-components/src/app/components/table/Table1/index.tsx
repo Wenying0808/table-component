@@ -3,6 +3,8 @@ import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
+import { TableCellStatus } from '../StatusCell';
+import { Table1Row } from '../Table1Row';
 
 type Analysis = {
     id: string;
@@ -47,7 +49,7 @@ export default function Table1() {
             )
         }),
         columnHelper.accessor('status', {
-            cell: info => info.getValue(),
+            cell: info => <TableCellStatus data={info.getValue()} />,
             header: () => (
                 <span className="table-header">
                     Status
@@ -74,9 +76,13 @@ export default function Table1() {
         getCoreRowModel: getCoreRowModel(),
     });
 
+    const tableStyles = {
+        padding: " 10px 20px",
+    }
+
     return (
         <div className="table1">
-            <table>
+            <table style={tableStyles}>
                 <thead>
                 {table.getHeaderGroups().map(headerGroup => (
                     <TableColumnHeaderRow key={headerGroup.id}>
@@ -93,7 +99,7 @@ export default function Table1() {
                 </thead>
                 <tbody>
                     {table.getRowModel().rows.map(row => (
-                        <tr key={row.id}>
+                        <Table1Row key={row.id}>
                             {row.getVisibleCells().map(cell => (
                                 <td key={cell.id}>
                                     {flexRender(
@@ -101,7 +107,7 @@ export default function Table1() {
                                         cell.getContext())}
                                 </td>
                             ))}
-                        </tr>
+                        </Table1Row>
                     ))}
                 </tbody>
             </table>

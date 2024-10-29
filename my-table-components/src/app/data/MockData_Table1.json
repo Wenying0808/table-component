@@ -19,5 +19,54 @@
         "duration": "",
         "status": "Running",
         "user": "John Doe"
+    },
+    {
+        "id": "4",
+        "name": "Sentiment Analysis",
+        "duration": 45,
+        "status": "Completed",
+        "user": "Mike Smith"
+    },
+    {
+        "id": "5",
+        "name": "Cluster Analysis",
+        "duration": 60,
+        "status": "Failed",
+        "user": "Emily Johnson"
+    },
+    {
+        "id": "6",
+        "name": "Time Series Forecasting",
+        "duration": 90,
+        "status": "Running",
+        "user": "David Lee"
+    },
+    {
+        "id": "7",
+        "name": "Anomaly Detection",
+        "duration": 35,
+        "status": "Completed",
+        "user": "Sarah Kim"
+    },
+    {
+        "id": "8",
+        "name": "Image Classification",
+        "duration": 75,
+        "status": "Failed",
+        "user": "Chris Brown"
+    },
+    {
+        "id": "9",
+        "name": "Natural Language Processing",
+        "duration": 120,
+        "status": "Running",
+        "user": "Lisa Davis"
+    },
+    {
+        "id": "10",
+        "name": "Regression Analysis",
+        "duration": 40,
+        "status": "Completed",
+        "user": "Mark Taylor"
     }
 ]
