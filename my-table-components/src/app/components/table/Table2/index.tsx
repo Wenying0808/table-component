@@ -1,5 +1,6 @@
 import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel } from '@tanstack/react-table'
 import table2Data from '../../../data/MockData_Table2.json';
+import { WorkflowAnalysis } from '../../../types/DataTypes';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
@@ -7,25 +8,6 @@ import { Table2Row } from '../Table2Row';
 import { Table2CellExpand } from '../Table2CellExpand';
 import { TableCellStatus } from '../../table/StatusCell';
 import { TableCellActions } from '../../table/ActionsCell';
-
-
-
-type BaseAnalysis = {
-    id: string;
-    name: string;
-    status: string;
-    actions: string[];
-    updatedTime: string;
-    duration: string;
-}
-
-type AppAnalysis = BaseAnalysis;
-
-type WorkflowAnalysis = BaseAnalysis & {
-    appAnalyses?: AppAnalysis[];
-}
-
-
 
 
 export default function Table2() {
@@ -101,7 +83,7 @@ export default function Table2() {
 
 
     return (
-        <div className="table1">
+
             <table>
                 <thead>
                 {table.getHeaderGroups().map(headerGroup => (
@@ -133,6 +115,6 @@ export default function Table2() {
                     ))}
                 </tbody>
             </table>
-        </div>
+
     )
 }
