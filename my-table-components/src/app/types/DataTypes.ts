@@ -1,10 +1,13 @@
-type BaseAnalysis = {
+
+
+export type BaseAnalysis = {
     id: string;
     name: string;
     status: string;
     actions: string[];
     updatedTime: string;
     duration: string;
+    user?: string;
 }
 
 // Table 2 - level 2: app

@@ -2,71 +2,91 @@
     {
         "id": "1",
         "name": "Analysis 1",
-        "duration": 30,
         "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 30,
         "user": "John Doe"
     },
     {
         "id": "2",
         "name": "Analysis 2",
-        "duration": 50,
         "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 50,
         "user": "Jane Doe"
     },
     {
         "id": "3",
         "name": "Analysis 3",
-        "duration": "",
         "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": "",
         "user": "John Doe"
     },
     {
         "id": "4",
         "name": "Sentiment Analysis",
-        "duration": 45,
         "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 45,
         "user": "Mike Smith"
     },
     {
         "id": "5",
         "name": "Cluster Analysis",
-        "duration": 60,
         "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 60,
         "user": "Emily Johnson"
     },
     {
         "id": "6",
         "name": "Time Series Forecasting",
-        "duration": 90,
         "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": "",
         "user": "David Lee"
     },
     {
         "id": "7",
         "name": "Anomaly Detection",
-        "duration": 35,
         "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 35,
         "user": "Sarah Kim"
     },
     {
         "id": "8",
         "name": "Image Classification",
-        "duration": 75,
         "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 75,
         "user": "Chris Brown"
     },
     {
         "id": "9",
         "name": "Natural Language Processing",
-        "duration": 120,
         "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 120,
         "user": "Lisa Davis"
     },
     {
         "id": "10",
         "name": "Regression Analysis",
-        "duration": 40,
         "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 40,
         "user": "Mark Taylor"
     }
 ]

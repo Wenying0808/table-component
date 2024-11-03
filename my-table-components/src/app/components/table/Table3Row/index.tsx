@@ -4,23 +4,22 @@ import { colors } from '../../styles/colors';
 export const Table3Row = <T extends ExpandableRow>({ row, children }: TableRowProps<T>) => {
     const rowStyles = {
         parentRow: {
+            boxSizing: "border-box",
             fontSize: "14px",
             fontWeight: 600,
-            borderBottom: `1px solid ${colors.alto}`,
             backgroundColor: `${colors.white}`,
             height: "46px",
+            borderTop: `1px solid ${colors.azure}`,
         },
         childRow: {
             fontSize: "13px",
             fontWeight: 500,
-            borderBottom: `1px solid ${colors.alto}`,
             backgroundColor: `${colors.white}`,
             height: "34px",
         },
         grandChildRow: {
             fontSize: "13px",
-            fontWeight: 500,
-            borderBottom: `1px solid ${colors.alto}`,
+            fontWeight: 400,
             backgroundColor: `${colors.wildSand}`,
             height: "34px",
         },
