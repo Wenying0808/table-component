@@ -16,7 +16,7 @@ export const TableCellActions = ({ data }: { data: string[]} ) => {
       };
 
     return (
-        <td>
+        <>
             <Button
                 variant="outlined"
                 onClick={handleClick}
@@ -44,6 +44,6 @@ export const TableCellActions = ({ data }: { data: string[]} ) => {
                 ))}
             </Menu>
 
-        </td>
+        </>
     )
 };

@@ -6,6 +6,8 @@ import { TableColumnHeaderRow } from "../TableColumnHeaderRow";
 import { Table3Row } from "../Table3Row";
 import { Table3CellExpand } from "../Table3CellExpand";
 import React from "react";
+import { TableCellActions } from "../ActionsCell";
+import { TableCellStatus } from "../StatusCell";
 
 export default function Table3() {
     const [data, setData] = useState<WorkflowTaskAnalysis[]>([]);
@@ -29,6 +31,18 @@ export default function Table3() {
         }),
         columnHelper.accessor('name', {
             header: 'Name',
+            cell: info => info.getValue(),
+        }),
+        columnHelper.accessor('status', {
+            header: 'Status',
+            cell: info => <TableCellStatus data={info.getValue()} />,
+        }),
+        columnHelper.accessor('actions', {
+            header: 'Actions',
+            cell: info => <TableCellActions data={info.getValue()} />,
+        }),
+        columnHelper.accessor('duration', {
+            header: 'Duration',
             cell: info => info.getValue(),
         }),
     ], [])

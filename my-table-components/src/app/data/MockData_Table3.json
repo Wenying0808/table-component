@@ -167,7 +167,7 @@
               "status": "Running",
               "actions": [],
               "updatedTime": "2024-10-20T12:00:00Z",
-              "duration": "25m"
+              "duration": ""
             },
             {
                 "id": "task2",
@@ -175,7 +175,7 @@
                 "status": "Queued",
                 "actions": [],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "25m"
+                "duration": ""
               },
               {
                 "id": "task3",
@@ -183,7 +183,7 @@
                 "status": "Queued",
                 "actions": [],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "15m"
+                "duration": ""
               }
           ]
         }

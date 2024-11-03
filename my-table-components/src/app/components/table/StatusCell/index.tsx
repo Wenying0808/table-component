@@ -22,6 +22,6 @@ export const TableCellStatus = ({ data }: { data: string }) => {
     }
 
     return (
-        <td style={cellStyles}>{data}</td>
+        < div style={cellStyles}>{data}</div>
     )
 };
