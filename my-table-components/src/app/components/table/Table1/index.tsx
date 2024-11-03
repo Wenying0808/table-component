@@ -7,6 +7,7 @@ import ColumHeader from '../ColumneHeader';
 import { TableCellStatus } from '../StatusCell';
 import { Table1Row } from '../Table1Row';
 import { BaseAnalysis } from '@/app/types/DataTypes';
+import { TableCellActions } from '../ActionsCell';
 
 
 const columnHelper = createColumnHelper<BaseAnalysis>();
@@ -14,7 +15,7 @@ const columnHelper = createColumnHelper<BaseAnalysis>();
 export default function Table1() {
    
     const [data, setData] = useState<BaseAnalysis[]>([]);
-    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration']); 
+    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions']); 
     const [sorting, setSorting] = useState<SortingState>([ {id: 'id', desc: true} ]);
 
     useEffect(() => {
@@ -97,6 +98,16 @@ export default function Table1() {
                 </ColumHeader>
             ),
             sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('actions', {
+            cell: info => <TableCellActions data={info.getValue()} />,
+            header: () => (
+                <ColumHeader 
+                    isSortable={false}
+                >
+                    Actions
+                </ColumHeader>
+            )
         }),
     ], []);
 

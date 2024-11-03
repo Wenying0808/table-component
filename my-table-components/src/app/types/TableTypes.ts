@@ -20,5 +20,5 @@ export interface TableColumnHeaderProps {
     children: React.ReactNode;
     isSortable?: boolean;
     sortingState?: SortingDirection;
-    onClick: () => void;
+    onClick?: () => void;
 };
