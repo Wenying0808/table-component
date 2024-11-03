@@ -4,7 +4,7 @@ import { WorkflowAnalysis } from '../../../types/DataTypes';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
-import ColumnHeader from '../ColumneHeader';
+import ColumnHeader from '../ColumnHeader';
 import { Table2Row } from '../Table2Row';
 import { Table2CellExpand } from '../Table2CellExpand';
 import { TableCellStatus } from '../../table/StatusCell';

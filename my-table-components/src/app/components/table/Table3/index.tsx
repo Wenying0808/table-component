@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { AppTaskAnalysis, TaskAnalysis, WorkflowTaskAnalysis } from "../../../types/DataTypes";
 import table3Data from "../../../data/MockData_Table3.json";
-import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { TableColumnHeaderRow } from "../TableColumnHeaderRow";
+import ColumnHeader from "../ColumnHeader";
 import { Table3Row } from "../Table3Row";
 import { Table3CellExpand } from "../Table3CellExpand";
 import React from "react";
@@ -11,13 +12,12 @@ import { TableCellStatus } from "../StatusCell";
 
 export default function Table3() {
     const [data, setData] = useState<WorkflowTaskAnalysis[]>([]);
+    const [sorting, setSorting] = useState<SortingState>([]);
     const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();
 
     useEffect(() => {
         setData(table3Data as WorkflowTaskAnalysis[]);
     }, []);
-
-    
 
     const columns = useMemo(() => [
         columnHelper.display({
@@ -26,24 +26,74 @@ export default function Table3() {
             header: () => <span className="table-header"></span>
         }),
         columnHelper.accessor('id', {
-            header: 'Id',
             cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
+                    Id
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('name', {
-            header: 'Name',
             cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
+                    Name
+                </ColumnHeader>
+            ),  
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('status', {
-            header: 'Status',
             cell: info => <TableCellStatus data={info.getValue()} />,
+            header: ({ column }) => (
+                <ColumnHeader
+                    isSortable={true}
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
+                    Status
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('actions', {
-            header: 'Actions',
             cell: info => <TableCellActions data={info.getValue()} />,
+            header: () => (
+                <ColumnHeader 
+                    isSortable={false}
+                >
+                    Actions
+                </ColumnHeader>
+            )
         }),
         columnHelper.accessor('duration', {
-            header: 'Duration',
             cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader
+                    isSortable={true}
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
+                    Duration
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
     ], [])
 
@@ -65,6 +115,11 @@ export default function Table3() {
         getCoreRowModel: getCoreRowModel(),
         getRowCanExpand: () => true,
         getExpandedRowModel: getExpandedRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        state:{
+            sorting,
+        },
+        onSortingChange: setSorting,
     })
 
     return (

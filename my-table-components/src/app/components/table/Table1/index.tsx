@@ -3,7 +3,7 @@ import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
-import ColumHeader from '../ColumneHeader';
+import ColumHeader from '../ColumnHeader';
 import { TableCellStatus } from '../StatusCell';
 import { Table1Row } from '../Table1Row';
 import { BaseAnalysis } from '@/app/types/DataTypes';
