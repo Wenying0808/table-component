@@ -1,9 +1,10 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel, SortingState, getSortedRowModel } from '@tanstack/react-table'
 import table2Data from '../../../data/MockData_Table2.json';
 import { WorkflowAnalysis } from '../../../types/DataTypes';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
+import ColumnHeader from '../ColumneHeader';
 import { Table2Row } from '../Table2Row';
 import { Table2CellExpand } from '../Table2CellExpand';
 import { TableCellStatus } from '../../table/StatusCell';
@@ -13,6 +14,7 @@ import { TableCellActions } from '../../table/ActionsCell';
 export default function Table2() {
    
     const [data, setData] = useState<WorkflowAnalysis[]>([]);
+    const [sorting, setSorting] = useState<SortingState>([ {id: 'id', desc: true} ]);
     const columnHelper = createColumnHelper<WorkflowAnalysis>();
 
     useEffect(() => {
@@ -27,42 +29,72 @@ export default function Table2() {
         }),
         columnHelper.accessor('id', {
             cell: info => info.getValue(),
-            header: () => (
-                <span className="table-header">
+            header: ({ column}) => (
+                <ColumnHeader 
+                    isSortable={true}
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
                     Id
-                </span>
-            )
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
-            header: () => (
-                <span className="table-header">
+            header: ({ column }) => (
+                <ColumnHeader 
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
                     Name
-                </span>
-            )
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
-            header: () => (
-                <span className="table-header">
+            header: ( {column }) => (
+                <ColumnHeader 
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
                     Duration
-                </span>
-            )
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('status', {
             cell: info => <TableCellStatus data={info.getValue()} />,
-            header: () => (
-                <span className="table-header">
+            header: ({ column }) => (
+                <ColumnHeader
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    onClick={() => {
+                        column.toggleSorting();
+                    }}
+                >
                     Status
-                </span>
-            )
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('actions', {
             cell: info => <TableCellActions data={info.getValue()} />,
             header: () => (
-                <span className="table-header">
+                <ColumnHeader
+                    isSortable={false}
+                >
                     Actions
-                </span>
+                </ColumnHeader>
             )
         }),
     ], []);
@@ -79,6 +111,11 @@ export default function Table2() {
         getRowCanExpand: () => true,
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        state:{
+            sorting,
+        },
+        onSortingChange: setSorting,
     });
 
 

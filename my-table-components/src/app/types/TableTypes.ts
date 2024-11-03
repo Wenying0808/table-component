@@ -7,7 +7,6 @@ export interface ExpandableRow {
 export interface TableRowProps<T extends ExpandableRow> {
     row: Row<T>;
     children: React.ReactNode;
-    /*style?: React.CSSProperties;*/
 }
 
 export interface TableCellExpandProps<T extends ExpandableRow> {

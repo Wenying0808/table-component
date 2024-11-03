@@ -37,7 +37,6 @@ export default function Table1() {
                 </ColumHeader>
             ),
             sortingFn: 'alphanumeric',
-            sortDescFirst: true,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
