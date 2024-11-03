@@ -6,7 +6,7 @@
       "actions": ["Download", "Archive", "Report"],
       "updatedTime": "2024-10-20T14:30:00Z",
       "duration": "2h 30m",
-      "Analyses": [
+      "analyses": [
         {
           "id": "aa1",
           "name": "IGX-Profile",
@@ -118,7 +118,7 @@
       "actions": ["Pause", "Archive"],
       "updatedTime": "2024-10-21T09:00:00Z",
       "duration": "2h",
-      "Analyses": [
+      "analyses": [
        {
           "id": "aa4",
           "name": "IGX-Profile",

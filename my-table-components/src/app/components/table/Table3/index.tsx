@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { WorkflowTaskAnalysis } from "../../../types/DataTypes";
+import { AppTaskAnalysis, TaskAnalysis, WorkflowTaskAnalysis } from "../../../types/DataTypes";
 import table3Data from "../../../data/MockData_Table3.json";
 import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, useReactTable } from "@tanstack/react-table";
 import { TableColumnHeaderRow } from "../TableColumnHeaderRow";
+import { Table3Row } from "../Table3Row";
+import { Table3CellExpand } from "../Table3CellExpand";
+import React from "react";
 
 export default function Table3() {
     const [data, setData] = useState<WorkflowTaskAnalysis[]>([]);
@@ -12,8 +15,14 @@ export default function Table3() {
         setData(table3Data as WorkflowTaskAnalysis[]);
     }, []);
 
-    const columns = useMemo(() => [
+    
 
+    const columns = useMemo(() => [
+        columnHelper.display({
+            id: 'expand',
+            cell: ({ row }) => <Table3CellExpand row={row} />,
+            header: () => <span className="table-header"></span>
+        }),
         columnHelper.accessor('id', {
             header: 'Id',
             cell: info => info.getValue(),
@@ -24,9 +33,21 @@ export default function Table3() {
         }),
     ], [])
 
+    type Table3RowData = WorkflowTaskAnalysis | AppTaskAnalysis | TaskAnalysis;
+
     const table = useReactTable({
         columns,
         data,
+        getSubRows: (row: Table3RowData) => {
+            console.log('getSubRows called with:', row);
+            if (row && 'analyses' in row) {
+                return row.analyses;
+            }
+            if ('tasks' in row) {
+                return row.tasks;
+            }
+            return undefined;
+        },
         getCoreRowModel: getCoreRowModel(),
         getRowCanExpand: () => true,
         getExpandedRowModel: getExpandedRowModel(),
@@ -49,16 +70,19 @@ export default function Table3() {
             </thead>
             <tbody>
                 {table.getRowModel().rows.map(row => (
-                    <tr key={row.id}>
-                        {row.getVisibleCells().map(cell => (
-                            <td key={cell.id}>
-                                {flexRender(
-                                    cell.column.columnDef.cell,
-                                    cell.getContext()
+                    <React.Fragment key={row.id}>
+                        <Table3Row key={row.id} row={row}>
+                            {row.getVisibleCells().map(cell => (
+                                <td key={cell.id}>
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext()
                                 )}
                             </td>
-                        ))}
-                    </tr>
+                            ))}
+                        </Table3Row>
+                    </React.Fragment>
+                    
                 ))}
             </tbody>
         </table>
