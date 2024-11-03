@@ -17,6 +17,7 @@ export const Table2CellExpand = <T extends ExpandableRow>({ row }: TableCellExpa
                 <IconButton 
                     onClick={() => row.toggleExpanded()} 
                     sx={{ color: colors.azure }}
+                    disableRipple
                 >
                     {row.getIsExpanded() ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                 </IconButton>

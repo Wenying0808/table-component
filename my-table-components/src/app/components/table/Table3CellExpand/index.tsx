@@ -36,7 +36,10 @@ export const Table3CellExpand = <T extends ExpandableRow>({ row }: TableCellExpa
             {(row.depth === 0 || row.depth === 1) && row.getCanExpand() ? (
                 <IconButton 
                     onClick={() => row.toggleExpanded()} 
-                    sx={{ color: row.depth === 0 ? colors.azure : colors.manatee }}
+                    sx={{ 
+                        color: row.depth === 0 ? colors.azure : colors.manatee 
+                    }}
+                    disableRipple
                 >
                     {row.getIsExpanded() ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
                 </IconButton>
