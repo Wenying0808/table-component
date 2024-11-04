@@ -1,4 +1,4 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState, RowPinningState } from '@tanstack/react-table'
 import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
@@ -16,7 +16,13 @@ export default function Table1() {
    
     const [data, setData] = useState<BaseAnalysis[]>([]);
     const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions']); 
-    const [sorting, setSorting] = useState<SortingState>([ {id: 'id', desc: true} ]);
+    const [sorting, setSorting] = useState<SortingState>([ 
+        { id: 'id', desc: true } 
+    ]);
+    const [rowPinning, setRowPinning] = React.useState<RowPinningState>({
+        top: [''],
+        bottom: [],
+    })
 
     useEffect(() => {
         setData(table1Data as BaseAnalysis[]);
@@ -116,23 +122,22 @@ export default function Table1() {
         state:{
             columnOrder,
             sorting,
+            rowPinning,
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onColumnOrderChange: setColumnOrder,
         onSortingChange: setSorting,
+        onRowPinningChange: setRowPinning,
     });
 
     console.log('table1 sorting state:', table.getState().sorting);
 
-    const tableStyles = {
-        padding: " 10px 20px",
-    }
 
     return (
         <div className="table1">
-            <table style={tableStyles}>
-                <thead>
+            <table>
+                <thead className="sticky-column-header">
                 {table.getHeaderGroups().map(headerGroup => (
                     <TableColumnHeaderRow key={headerGroup.id}>
                         {headerGroup.headers.map(header => (

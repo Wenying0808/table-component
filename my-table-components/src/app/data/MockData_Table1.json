@@ -88,5 +88,95 @@
         "updatedTime": "2024-10-20T14:30:00Z",
         "duration": 40,
         "user": "Mark Taylor"
+    },
+    {
+        "id": "11",
+        "name": "Deep Learning Model",
+        "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 90,
+        "user": "Rachel Chen"
+    },
+    {
+        "id": "12",
+        "name": "Market Basket Analysis",
+        "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 55,
+        "user": "Tom Wilson"
+    },
+    {
+        "id": "13",
+        "name": "Customer Segmentation",
+        "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": "",
+        "user": "Emma Thompson"
+    },
+    {
+        "id": "14",
+        "name": "Predictive Maintenance",
+        "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 65,
+        "user": "Alex Martinez"
+    },
+    {
+        "id": "15",
+        "name": "Text Classification",
+        "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 40,
+        "user": "Sophie Wang"
+    },
+    {
+        "id": "16",
+        "name": "Recommendation Engine",
+        "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": "",
+        "user": "James Anderson"
+    },
+    {
+        "id": "17",
+        "name": "Risk Assessment",
+        "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 70,
+        "user": "Maria Garcia"
+    },
+    {
+        "id": "18",
+        "name": "Network Analysis",
+        "status": "Failed",
+        "actions": ["Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 85,
+        "user": "Daniel Park"
+    },
+    {
+        "id": "19",
+        "name": "Fraud Detection",
+        "status": "Running",
+        "actions": [],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": "",
+        "user": "Julia Roberts"
+    },
+    {
+        "id": "20",
+        "name": "Supply Chain Optimization",
+        "status": "Completed",
+        "actions": ["View", "Report"],
+        "updatedTime": "2024-10-20T14:30:00Z",
+        "duration": 95,
+        "user": "Ryan Cooper"
     }
 ]
