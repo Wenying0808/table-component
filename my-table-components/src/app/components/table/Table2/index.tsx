@@ -120,8 +120,7 @@ export default function Table2() {
 
 
     return (
-
-            <table>
+            <table className="table2">
                 <thead className="sticky-column-header">
                 {table.getHeaderGroups().map(headerGroup => (
                     <TableColumnHeaderRow key={headerGroup.id}>

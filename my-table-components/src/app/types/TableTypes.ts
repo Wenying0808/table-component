@@ -21,3 +21,13 @@ export interface TableColumnHeaderProps {
     sortingState?: SortingDirection;
     onClick?: () => void;
 };
+
+export interface ColumnHeaderAddProps {
+    onClick: () => void;
+}
+
+export interface AddColumnModalProps {
+    open: boolean;
+    onClose: () => void;
+    columnOptions: { value: string; label: string }[];
+}

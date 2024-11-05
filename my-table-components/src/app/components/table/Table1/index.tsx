@@ -8,6 +8,8 @@ import { TableCellStatus } from '../StatusCell';
 import { Table1Row } from '../Table1Row';
 import { BaseAnalysis } from '@/app/types/DataTypes';
 import { TableCellActions } from '../ActionsCell';
+import { ColumnHeaderAdd } from '../ColumnHeaderAdd';
+import { AddColumnModal } from '../AddColumnModal';
 
 
 const columnHelper = createColumnHelper<BaseAnalysis>();
@@ -15,7 +17,7 @@ const columnHelper = createColumnHelper<BaseAnalysis>();
 export default function Table1() {
    
     const [data, setData] = useState<BaseAnalysis[]>([]);
-    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions']); 
+    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions', 'add']); 
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'id', desc: true } 
     ]);
@@ -23,6 +25,15 @@ export default function Table1() {
         top: [''],
         bottom: [],
     })
+    const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
+    const [availableColumns] = useState([
+        { value: 'id', label: 'Id' },
+        { value: 'name', label: 'Name' },
+        { value: 'user', label: 'User' },
+        { value: 'status', label: 'Status' },
+        { value: 'duration', label: 'Duration' },
+        { value: 'actions', label: 'Actions' }
+    ]);
 
     useEffect(() => {
         setData(table1Data as BaseAnalysis[]);
@@ -114,6 +125,15 @@ export default function Table1() {
                 </ColumHeader>
             )
         }),
+        columnHelper.display({
+            id: 'add',
+            cell: () => "",
+            header: () => (
+                <ColumnHeaderAdd 
+                    onClick={() => setIsAddColumnModalOpen(true)} 
+                />
+            )
+        })
     ], []);
 
     const table = useReactTable({ 
@@ -135,8 +155,13 @@ export default function Table1() {
 
 
     return (
-        <div className="table1">
-            <table>
+        <>
+            <AddColumnModal 
+                open={isAddColumnModalOpen} 
+                onClose={() => setIsAddColumnModalOpen(false)} 
+                columnOptions={availableColumns}
+            />
+            <table className="table1">
                 <thead className="sticky-column-header">
                 {table.getHeaderGroups().map(headerGroup => (
                     <TableColumnHeaderRow key={headerGroup.id}>
@@ -165,6 +190,6 @@ export default function Table1() {
                     ))}
                 </tbody>
             </table>
-        </div>
+        </>
     )
 }
