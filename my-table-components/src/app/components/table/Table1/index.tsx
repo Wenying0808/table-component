@@ -10,6 +10,7 @@ import { BaseAnalysis } from '@/app/types/DataTypes';
 import { TableCellActions } from '../ActionsCell';
 import { ColumnHeaderAdd } from '../ColumnHeaderAdd';
 import { AddColumnModal } from '../AddColumnModal';
+import { ColumnOption } from '@/app/types/TableTypes';
 
 
 const columnHelper = createColumnHelper<BaseAnalysis>();
@@ -26,14 +27,27 @@ export default function Table1() {
         bottom: [],
     })
     const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
-    const [availableColumns] = useState([
-        { value: 'id', label: 'Id' },
-        { value: 'name', label: 'Name' },
-        { value: 'user', label: 'User' },
-        { value: 'status', label: 'Status' },
-        { value: 'duration', label: 'Duration' },
-        { value: 'actions', label: 'Actions' }
-    ]);
+    const [columnVisibility, setColumnVisibility] = useState({
+        'id': true,
+        'name': false,
+        'user': true,
+        'status': true,
+        'duration': true,
+        'actions': true,
+        'add': true,
+    });
+
+
+    const availableColumns = useMemo(() => {
+        return [
+                { value: 'id', label: 'Id' },
+                { value: 'name', label: 'Name' },
+                { value: 'user', label: 'User' },
+                { value: 'status', label: 'Status' },
+                { value: 'duration', label: 'Duration' },
+                { value: 'actions', label: 'Actions' }
+        ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
+    }, [columnVisibility]);
 
     useEffect(() => {
         setData(table1Data as BaseAnalysis[]);
@@ -46,6 +60,7 @@ export default function Table1() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={false}
                     handleSorting={() => {
                         column.toggleSorting();
                     }}
@@ -54,6 +69,7 @@ export default function Table1() {
                 </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',
+            enableHiding: false,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -61,8 +77,12 @@ export default function Table1() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Name
@@ -76,8 +96,12 @@ export default function Table1() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Duration
@@ -91,8 +115,12 @@ export default function Table1() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Status
@@ -106,8 +134,12 @@ export default function Table1() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     User
@@ -120,6 +152,7 @@ export default function Table1() {
             header: () => (
                 <ColumnHeader 
                     isSortable={false}
+                    columnIsRemoveable={false}
                 >
                     Actions
                 </ColumnHeader>
@@ -132,7 +165,8 @@ export default function Table1() {
                 <ColumnHeaderAdd 
                     onClick={() => setIsAddColumnModalOpen(true)} 
                 />
-            )
+            ),
+            enableHiding: false,
         })
     ], []);
 
@@ -143,16 +177,26 @@ export default function Table1() {
             columnOrder,
             sorting,
             rowPinning,
+            columnVisibility,
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onColumnOrderChange: setColumnOrder,
         onSortingChange: setSorting,
         onRowPinningChange: setRowPinning,
+        onColumnVisibilityChange: setColumnVisibility,
     });
 
     console.log('table1 sorting state:', table.getState().sorting);
 
+    const handleAddColumns = (columns: ColumnOption[]) => {
+        setColumnVisibility(prev => ({
+            ...prev,
+            ...Object.fromEntries(columns.map(column => [column.value, true]))
+        }));
+        console.log('columnVisibility', columnVisibility);
+        setIsAddColumnModalOpen(false);
+    };
 
     return (
         <>
@@ -160,6 +204,7 @@ export default function Table1() {
                 open={isAddColumnModalOpen} 
                 onClose={() => setIsAddColumnModalOpen(false)} 
                 columnOptions={availableColumns}
+                onAddColumns={handleAddColumns}
             />
             <table className="table1">
                 <thead className="sticky-column-header">

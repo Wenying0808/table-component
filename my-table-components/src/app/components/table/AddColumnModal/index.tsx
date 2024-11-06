@@ -4,10 +4,15 @@ import Select, { MultiValue } from 'react-select';
 import { colors } from '../../styles/colors';
 import { useState } from 'react';
 
-export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, columnOptions }) => {
+export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, columnOptions, onAddColumns }) => {
     const [selectedColumns, setSelectedColumns] = useState<ColumnOption[]>([]);
     const handleSelectionChange = (newValue: MultiValue<ColumnOption>) => {
         setSelectedColumns(newValue as ColumnOption[])
+    };
+    const handleAddColumns = () => {
+        onAddColumns(selectedColumns);
+        onClose();
+        setSelectedColumns([]);
     };
     console.log('selectedColumns', selectedColumns);
     return (
@@ -51,7 +56,7 @@ export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, c
                         Cancel
                     </Button>
                     <Button 
-                        onClick={onClose} 
+                        onClick={handleAddColumns} 
                         variant="contained" 
                         sx={{ 
                             color: colors.white, 

@@ -1,10 +1,11 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { SortingDirection, TableColumnHeaderProps } from '../../../types/TableTypes';
 import { useState } from 'react';
 import { colors } from '../../styles/colors';
 
-export default function ColumnHeader({ children, isSortable = false, sortingState, handleSorting } : TableColumnHeaderProps ) {
+export default function ColumnHeader({ children, isSortable = false, sortingState, columnIsRemoveable,handleSorting, handleRemoveColumn } : TableColumnHeaderProps ) {
     const [isHovered, setIsHovered] = useState(false);
     const getSortingIcon = (sortingDirection: SortingDirection) => {
         if (sortingDirection === 'asc') return <ArrowUpwardIcon onClick={handleSorting} style={{color: colors.azure, cursor: 'pointer'}} />;
@@ -28,6 +29,16 @@ export default function ColumnHeader({ children, isSortable = false, sortingStat
             {isSortable && (sortingState || isHovered) &&
                 getSortingIcon(sortingState)
             }
+            {columnIsRemoveable &&isHovered && 
+                <CancelIcon 
+                    onClick={handleRemoveColumn} 
+                    style={{
+                        color: colors.manatee, 
+                        cursor: 'pointer'
+                    }} 
+                />
+            }
+                
         </span>
     )
 }
