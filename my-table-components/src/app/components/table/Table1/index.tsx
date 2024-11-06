@@ -1,4 +1,4 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState, RowPinningState } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState, VisibilityState } from '@tanstack/react-table'
 import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
@@ -22,12 +22,8 @@ export default function Table1() {
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'id', desc: true } 
     ]);
-    const [rowPinning, setRowPinning] = React.useState<RowPinningState>({
-        top: [''],
-        bottom: [],
-    })
     const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
-    const [columnVisibility, setColumnVisibility] = useState({
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         'id': true,
         'name': false,
         'user': true,
@@ -40,12 +36,12 @@ export default function Table1() {
 
     const availableColumns = useMemo(() => {
         return [
+                { value: 'actions', label: 'Actions' },
+                { value: 'duration', label: 'Duration' },
                 { value: 'id', label: 'Id' },
                 { value: 'name', label: 'Name' },
-                { value: 'user', label: 'User' },
                 { value: 'status', label: 'Status' },
-                { value: 'duration', label: 'Duration' },
-                { value: 'actions', label: 'Actions' }
+                { value: 'user', label: 'User' },
         ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
     }, [columnVisibility]);
 
@@ -176,25 +172,23 @@ export default function Table1() {
         state:{
             columnOrder,
             sorting,
-            rowPinning,
             columnVisibility,
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onColumnOrderChange: setColumnOrder,
         onSortingChange: setSorting,
-        onRowPinningChange: setRowPinning,
         onColumnVisibilityChange: setColumnVisibility,
     });
 
-    console.log('table1 sorting state:', table.getState().sorting);
+    /*console.log('table1 sorting state:', table.getState().sorting);*/
 
     const handleAddColumns = (columns: ColumnOption[]) => {
         setColumnVisibility(prev => ({
             ...prev,
             ...Object.fromEntries(columns.map(column => [column.value, true]))
         }));
-        console.log('columnVisibility', columnVisibility);
+        /*console.log('columnVisibility', columnVisibility);*/
         setIsAddColumnModalOpen(false);
     };
 

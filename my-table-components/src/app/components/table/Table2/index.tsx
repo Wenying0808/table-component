@@ -1,4 +1,4 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel, SortingState, getSortedRowModel } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getExpandedRowModel, SortingState, getSortedRowModel, VisibilityState } from '@tanstack/react-table'
 import table2Data from '../../../data/MockData_Table2.json';
 import { WorkflowAnalysis } from '../../../types/DataTypes';
 import { useMemo, useState, useEffect } from 'react';
@@ -9,12 +9,34 @@ import { Table2Row } from '../Table2Row';
 import { Table2CellExpand } from '../Table2CellExpand';
 import { TableCellStatus } from '../../table/StatusCell';
 import { TableCellActions } from '../../table/ActionsCell';
+import { ColumnHeaderAdd } from '../ColumnHeaderAdd';
+import { AddColumnModal } from '../AddColumnModal';
+import { ColumnOption } from '@/app/types/TableTypes';
 
 
 export default function Table2() {
    
     const [data, setData] = useState<WorkflowAnalysis[]>([]);
     const [sorting, setSorting] = useState<SortingState>([ {id: 'id', desc: true} ]);
+    const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+        'id': true,
+        'name': false,
+        'status': true,
+        'duration': true,
+        'actions': true,
+        'add': true,
+    });
+    const availableColumns = useMemo(() => {
+        return [
+                { value: 'actions', label: 'Actions' },
+                { value: 'duration', label: 'Duration' },
+                { value: 'id', label: 'Id' },
+                { value: 'name', label: 'Name' },
+                { value: 'status', label: 'Status' },
+        ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
+    }, [columnVisibility]);
+
     const columnHelper = createColumnHelper<WorkflowAnalysis>();
 
     useEffect(() => {
@@ -33,6 +55,7 @@ export default function Table2() {
                 <ColumnHeader 
                     isSortable={true}
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={false}
                     handleSorting={() => {
                         column.toggleSorting();
                     }}
@@ -41,6 +64,7 @@ export default function Table2() {
                 </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',
+            enableHiding: false,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -48,8 +72,12 @@ export default function Table2() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Name
@@ -63,8 +91,12 @@ export default function Table2() {
                 <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Duration
@@ -78,8 +110,12 @@ export default function Table2() {
                 <ColumnHeader
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
                     handleSorting={() => {
                         column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        column.toggleVisibility(false);
                     }}
                 >
                     Status
@@ -92,11 +128,22 @@ export default function Table2() {
             header: () => (
                 <ColumnHeader
                     isSortable={false}
+                    columnIsRemoveable={false}
                 >
                     Actions
                 </ColumnHeader>
             )
         }),
+        columnHelper.display({
+            id: 'add',
+            cell: () => "",
+            header: () => (
+                <ColumnHeaderAdd 
+                    onClick={() => setIsAddColumnModalOpen(true)} 
+                />
+            ),
+            enableHiding: false,
+        })
     ], []);
 
     const table = useReactTable({ 
@@ -114,12 +161,30 @@ export default function Table2() {
         getSortedRowModel: getSortedRowModel(),
         state:{
             sorting,
+            columnVisibility,
         },
         onSortingChange: setSorting,
+        onColumnVisibilityChange: setColumnVisibility,
     });
+
+    const handleAddColumns = (columns: ColumnOption[]) => {
+        setColumnVisibility(prev => ({
+            ...prev,
+            ...Object.fromEntries(columns.map(column => [column.value, true]))
+        }));
+        /*console.log('columnVisibility', columnVisibility);*/
+        setIsAddColumnModalOpen(false);
+    };
 
 
     return (
+        <>
+            <AddColumnModal 
+                open={isAddColumnModalOpen} 
+                onClose={() => setIsAddColumnModalOpen(false)} 
+                columnOptions={availableColumns}
+                onAddColumns={handleAddColumns}
+            />
             <table className="table2">
                 <thead className="sticky-column-header">
                 {table.getHeaderGroups().map(headerGroup => (
@@ -151,6 +216,6 @@ export default function Table2() {
                     ))}
                 </tbody>
             </table>
-
+        </>
     )
 }

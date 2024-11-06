@@ -6,15 +6,19 @@ import { useState } from 'react';
 
 export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, columnOptions, onAddColumns }) => {
     const [selectedColumns, setSelectedColumns] = useState<ColumnOption[]>([]);
+
     const handleSelectionChange = (newValue: MultiValue<ColumnOption>) => {
         setSelectedColumns(newValue as ColumnOption[])
     };
+
     const handleAddColumns = () => {
         onAddColumns(selectedColumns);
         onClose();
         setSelectedColumns([]);
     };
-    console.log('selectedColumns', selectedColumns);
+
+    /*console.log('selectedColumns', selectedColumns);*/
+
     return (
         <Modal open={open}>
             <div style={{
@@ -62,7 +66,8 @@ export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, c
                             color: colors.white, 
                             backgroundColor: colors.azure,
                             '&:disabled': {
-                                backgroundColor: colors.moodyBlue
+                                color: colors.white,
+                                backgroundColor: colors.moodyBlue,
                             }
                         }}
                         disabled={selectedColumns.length === 0}
