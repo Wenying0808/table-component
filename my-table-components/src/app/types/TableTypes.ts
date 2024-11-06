@@ -19,15 +19,21 @@ export interface TableColumnHeaderProps {
     children: React.ReactNode;
     isSortable?: boolean;
     sortingState?: SortingDirection;
-    onClick?: () => void;
+    handleSorting?: () => void;
+    handleRemoveColumn?: () => void;
 };
 
 export interface ColumnHeaderAddProps {
     onClick: () => void;
 }
 
+export interface ColumnOption {
+    value: string;
+    label: string;
+}
+
 export interface AddColumnModalProps {
     open: boolean;
     onClose: () => void;
-    columnOptions: { value: string; label: string }[];
+    columnOptions: ColumnOption[];
 }

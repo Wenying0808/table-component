@@ -3,7 +3,7 @@ import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
-import ColumHeader from '../ColumnHeader';
+import ColumnHeader from  '../ColumnHeader';
 import { TableCellStatus } from '../StatusCell';
 import { Table1Row } from '../Table1Row';
 import { BaseAnalysis } from '@/app/types/DataTypes';
@@ -43,86 +43,86 @@ export default function Table1() {
         columnHelper.accessor('id', {
             cell: info => info.getValue(),
             header: ({ column }) => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
                     Id
-                </ColumHeader>
+                </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
             header: ({ column }) => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
                     Name
-                </ColumHeader>
+                </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
             header: ({ column }) => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
                     Duration
-                </ColumHeader>
+                </ColumnHeader>
             ),
             sortingFn: 'alphanumeric'
         }),
         columnHelper.accessor('status', {
             cell: info => <TableCellStatus data={info.getValue()} />,
             header: ({ column }) => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
                     Status
-                </ColumHeader>
+                </ColumnHeader>
             ),
             sortingFn: 'alphanumeric'
         }),
         columnHelper.accessor('user', {
             cell: info => info.getValue(),
             header: ({ column }) => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
                     User
-                </ColumHeader>
+                </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('actions', {
             cell: info => <TableCellActions data={info.getValue()} />,
             header: () => (
-                <ColumHeader 
+                <ColumnHeader 
                     isSortable={false}
                 >
                     Actions
-                </ColumHeader>
+                </ColumnHeader>
             )
         }),
         columnHelper.display({

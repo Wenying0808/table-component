@@ -31,7 +31,7 @@ export default function Table3() {
                 <ColumnHeader
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
@@ -46,7 +46,7 @@ export default function Table3() {
                 <ColumnHeader
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
@@ -61,7 +61,7 @@ export default function Table3() {
                 <ColumnHeader
                     isSortable={true}
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
@@ -86,7 +86,7 @@ export default function Table3() {
                 <ColumnHeader
                     isSortable={true}
                     sortingState={column.getIsSorted()}
-                    onClick={() => {
+                    handleSorting={() => {
                         column.toggleSorting();
                     }}
                 >
