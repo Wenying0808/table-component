@@ -11,28 +11,29 @@ import { TableCellActions } from '../ActionsCell';
 import { ColumnHeaderAdd } from '../ColumnHeaderAdd';
 import { AddColumnModal } from '../AddColumnModal';
 import { ColumnOption } from '@/app/types/TableTypes';
+import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 
 
-const columnHelper = createColumnHelper<BaseAnalysis>();
+
 
 export default function Table1() {
-   
+    const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
-    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions', 'add']); 
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'id', desc: true } 
     ]);
+    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions', 'add']);
     const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         'id': true,
-        'name': false,
-        'user': true,
+        'name': true,
+        'user': false,
         'status': true,
-        'duration': true,
+        'duration': false,
         'actions': true,
         'add': true,
     });
-
 
     const availableColumns = useMemo(() => {
         return [
@@ -54,6 +55,7 @@ export default function Table1() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={false}
@@ -71,6 +73,7 @@ export default function Table1() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -90,6 +93,7 @@ export default function Table1() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -109,6 +113,7 @@ export default function Table1() {
             cell: info => <TableCellStatus data={info.getValue()} />,
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -128,6 +133,7 @@ export default function Table1() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -145,8 +151,9 @@ export default function Table1() {
         }),
         columnHelper.accessor('actions', {
             cell: info => <TableCellActions data={info.getValue()} />,
-            header: () => (
+            header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={false}
                     columnIsRemoveable={false}
                 >
@@ -189,7 +196,29 @@ export default function Table1() {
             ...Object.fromEntries(columns.map(column => [column.value, true]))
         }));
         /*console.log('columnVisibility', columnVisibility);*/
+        setColumnOrder(prevOrder => {
+            const newColumns = columns.map(column => column.value);
+            const initialColumns = prevOrder.filter(column => column !== 'add');
+            return [...initialColumns, ...newColumns, "add"];
+            
+        });
         setIsAddColumnModalOpen(false);
+    };
+
+    const sensors = useSensors(
+        useSensor(PointerSensor)
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            const oldIndex = columnOrder.indexOf(active.id.toString());
+            const newIndex = columnOrder.indexOf(over.id.toString());
+            const newColumnOrder = [...columnOrder];
+            newColumnOrder.splice(oldIndex, 1);
+            newColumnOrder.splice(newIndex, 0, active.id.toString());
+            setColumnOrder(newColumnOrder);
+        }
     };
 
     return (
@@ -200,35 +229,45 @@ export default function Table1() {
                 columnOptions={availableColumns}
                 onAddColumns={handleAddColumns}
             />
-            <table className="table1">
-                <thead className="sticky-column-header">
-                {table.getHeaderGroups().map(headerGroup => (
-                    <TableColumnHeaderRow key={headerGroup.id}>
-                        {headerGroup.headers.map(header => (
-                            <th key={header.id}>
-                                {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                )}
-                            </th>
-                        ))}
-                    </TableColumnHeaderRow>
-                ))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <Table1Row key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td key={cell.id}>
-                                    {flexRender(
-                                        cell.column.columnDef.cell,
-                                        cell.getContext())}
-                                </td>
-                            ))}
-                        </Table1Row>
+            <DndContext
+                sensors={sensors}
+                onDragEnd={handleDragEnd}
+            >
+                <table className="table1">
+                    <thead className="sticky-column-header">
+                    {table.getHeaderGroups().map(headerGroup => (
+                        <TableColumnHeaderRow key={headerGroup.id}>
+                            <SortableContext
+                                items={headerGroup.headers.map(header => header.id)}
+                                strategy={horizontalListSortingStrategy}
+                            >
+                                {headerGroup.headers.map(header => (
+                                    <th key={header.id}>
+                                        {flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                        )}
+                                    </th>
+                                ))}
+                            </SortableContext>
+                        </TableColumnHeaderRow>
                     ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {table.getRowModel().rows.map(row => (
+                            <Table1Row key={row.id}>
+                                {row.getVisibleCells().map(cell => (
+                                    <td key={cell.id}>
+                                        {flexRender(
+                                            cell.column.columnDef.cell,
+                                            cell.getContext())}
+                                    </td>
+                                ))}
+                            </Table1Row>
+                        ))}
+                    </tbody>
+                </table>
+            </DndContext>
         </>
     )
 }

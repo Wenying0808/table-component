@@ -21,9 +21,9 @@ export default function Table2() {
     const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         'id': true,
-        'name': false,
+        'name': true,
         'status': true,
-        'duration': true,
+        'duration': false,
         'actions': true,
         'add': true,
     });
@@ -53,6 +53,7 @@ export default function Table2() {
             cell: info => info.getValue(),
             header: ({ column}) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true}
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={false}
@@ -70,6 +71,7 @@ export default function Table2() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -87,8 +89,9 @@ export default function Table2() {
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
-            header: ( {column }) => (
+            header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -108,6 +111,7 @@ export default function Table2() {
             cell: info => <TableCellStatus data={info.getValue()} />,
             header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -125,8 +129,9 @@ export default function Table2() {
         }),
         columnHelper.accessor('actions', {
             cell: info => <TableCellActions data={info.getValue()} />,
-            header: () => (
+            header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={false}
                     columnIsRemoveable={false}
                 >

@@ -20,9 +20,9 @@ export default function Table3() {
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
         'expand': true,
         'id': true,
-        'name': false,
+        'name': true,
         'status': true,
-        'duration': true,
+        'duration': false,
         'actions': true,
         'add': true,
     });
@@ -53,6 +53,7 @@ export default function Table3() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={false}
@@ -70,6 +71,7 @@ export default function Table3() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={true} 
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -89,6 +91,7 @@ export default function Table3() {
             cell: info => <TableCellStatus data={info.getValue()} />,
             header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={true}
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}
@@ -106,8 +109,9 @@ export default function Table3() {
         }),
         columnHelper.accessor('actions', {
             cell: info => <TableCellActions data={info.getValue()} />,
-            header: () => (
+            header: ({ column }) => (
                 <ColumnHeader 
+                    id={column.id}
                     isSortable={false}
                     columnIsRemoveable={false}
                 >
@@ -119,6 +123,7 @@ export default function Table3() {
             cell: info => info.getValue(),
             header: ({ column }) => (
                 <ColumnHeader
+                    id={column.id}
                     isSortable={true}
                     sortingState={column.getIsSorted()}
                     columnIsRemoveable={true}

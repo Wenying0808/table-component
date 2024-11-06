@@ -16,6 +16,7 @@ export interface TableCellExpandProps<T extends ExpandableRow> {
 export type SortingDirection = 'asc' | 'desc' | false | undefined;
 
 export interface TableColumnHeaderProps {
+    id: string;
     children: React.ReactNode;
     isSortable?: boolean;
     sortingState?: SortingDirection;
