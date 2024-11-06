@@ -1,4 +1,4 @@
-import { Row } from '@tanstack/react-table';
+import { Row, VisibilityState } from '@tanstack/react-table';
 
 export interface ExpandableRow {
     id: string;
@@ -39,4 +39,9 @@ export interface AddColumnModalProps {
     onClose: () => void;
     columnOptions: ColumnOption[];
     onAddColumns: (columns: ColumnOption[]) => void;
+}
+
+export interface TableColumnsManagementProps {
+    initialColumnOrder: string[];
+    initialColumnVisibility: VisibilityState;
 }

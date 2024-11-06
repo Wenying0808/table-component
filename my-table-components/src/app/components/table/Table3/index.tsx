@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { AppTaskAnalysis, TaskAnalysis, WorkflowTaskAnalysis } from "../../../types/DataTypes";
 import table3Data from "../../../data/MockData_Table3.json";
-import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { TableColumnHeaderRow } from "../TableColumnHeaderRow";
 import ColumnHeader from "../ColumnHeader";
 import { Table3Row } from "../Table3Row";
@@ -11,21 +11,38 @@ import { TableCellActions } from "../ActionsCell";
 import { TableCellStatus } from "../StatusCell";
 import { ColumnHeaderAdd } from "../ColumnHeaderAdd";
 import { AddColumnModal } from "../AddColumnModal";
-import { ColumnOption } from "@/app/types/TableTypes";
+import { DndContext } from '@dnd-kit/core';
+import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
 export default function Table3() {
+    const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();
     const [data, setData] = useState<WorkflowTaskAnalysis[]>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
-    const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-        'expand': true,
-        'id': true,
-        'name': true,
-        'status': true,
-        'duration': false,
-        'actions': true,
-        'add': true,
-    });
+    const {
+        columnOrder,
+        setColumnOrder,
+        columnVisibility,
+        setColumnVisibility,
+        isAddColumnModalOpen,
+        setIsAddColumnModalOpen,
+        handleAddColumns,
+        handleRemoveColumn,
+        sensors,
+        handleDragEnd,
+    } = TableColumnsManagement({
+        initialColumnOrder: ['expand', 'id', 'name', 'status', 'actions', 'add'],
+        initialColumnVisibility: {
+            'expand': true,
+            'id': true,
+            'name': true,
+            'status': true,
+            'duration': false,
+            'actions': true,
+            'add': true,
+        }
+    })
+
     const availableColumns = useMemo(() => {
         return [
                 { value: 'actions', label: 'Actions' },
@@ -36,7 +53,7 @@ export default function Table3() {
         ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
     }, [columnVisibility]);
 
-    const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();
+    
 
     useEffect(() => {
         setData(table3Data as WorkflowTaskAnalysis[]);
@@ -79,7 +96,7 @@ export default function Table3() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Name
@@ -99,7 +116,7 @@ export default function Table3() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Status
@@ -131,7 +148,7 @@ export default function Table3() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Duration
@@ -173,19 +190,13 @@ export default function Table3() {
         state:{
             sorting,
             columnVisibility,
+            columnOrder,
         },
         onSortingChange: setSorting,
         onColumnVisibilityChange: setColumnVisibility,
+        onColumnOrderChange: setColumnOrder,
     });
 
-    const handleAddColumns = (columns: ColumnOption[]) => {
-        setColumnVisibility(prev => ({
-            ...prev,
-            ...Object.fromEntries(columns.map(column => [column.value, true]))
-        }));
-        /*console.log('columnVisibility', columnVisibility);*/
-        setIsAddColumnModalOpen(false);
-    };
 
     return (
         <>
@@ -195,37 +206,46 @@ export default function Table3() {
                 columnOptions={availableColumns}
                 onAddColumns={handleAddColumns}
             />
-            <table className="table3">
-                <thead className="sticky-column-header">
-                {table.getHeaderGroups().map(headerGroup => (
-                    <TableColumnHeaderRow key={headerGroup.id}>
-                        {headerGroup.headers.map(header => (
-                            <th key={header.id}>
-                                {flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                )}
-                            </th>
+            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                <table className="table3">
+                    <thead className="sticky-column-header">
+                        {table.getHeaderGroups().map(headerGroup => (
+                            <TableColumnHeaderRow key={headerGroup.id}>
+                                <SortableContext 
+                                    items={headerGroup.headers.map(header => header.id)}
+                                    strategy={horizontalListSortingStrategy}
+                                >
+                                    {headerGroup.headers.map(header => (
+                                        <th key={header.id}>
+                                            {flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                        </th>
+                                    ))}
+                                </SortableContext>
+                            </TableColumnHeaderRow>
                         ))}
-                        </TableColumnHeaderRow>))}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.map(row => (
-                        <React.Fragment key={row.id}>
-                            <Table3Row key={row.id} row={row}>
-                                {row.getVisibleCells().map(cell => (
-                                    <td key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext()
-                                    )}
-                                </td>
-                                ))}
-                            </Table3Row>
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </table>
+                            
+                    </thead>
+                    <tbody>
+                        {table.getRowModel().rows.map(row => (
+                            <React.Fragment key={row.id}>
+                                <Table3Row key={row.id} row={row}>
+                                    {row.getVisibleCells().map(cell => (
+                                        <td key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                        )}
+                                    </td>
+                                    ))}
+                                </Table3Row>
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            </DndContext>
         </>
     );
 }

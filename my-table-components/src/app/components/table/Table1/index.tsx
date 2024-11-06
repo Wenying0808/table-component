@@ -1,4 +1,4 @@
-import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState, VisibilityState } from '@tanstack/react-table'
+import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState } from '@tanstack/react-table'
 import table1Data from '../../../data/MockData_Table1.json';
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
@@ -10,11 +10,9 @@ import { BaseAnalysis } from '@/app/types/DataTypes';
 import { TableCellActions } from '../ActionsCell';
 import { ColumnHeaderAdd } from '../ColumnHeaderAdd';
 import { AddColumnModal } from '../AddColumnModal';
-import { ColumnOption } from '@/app/types/TableTypes';
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext } from '@dnd-kit/core';
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-
-
+import TableColumnsManagement from '@/app/tableManagement/tableColumnsManagement';
 
 
 export default function Table1() {
@@ -23,17 +21,30 @@ export default function Table1() {
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'id', desc: true } 
     ]);
-    const [columnOrder, setColumnOrder] = useState<string[]>(['id', 'name', 'user', 'status', 'duration', 'actions', 'add']);
-    const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
-    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
-        'id': true,
-        'name': true,
-        'user': false,
-        'status': true,
-        'duration': false,
-        'actions': true,
-        'add': true,
-    });
+
+    const {
+        columnOrder,
+        setColumnOrder,
+        columnVisibility,
+        setColumnVisibility,
+        isAddColumnModalOpen,
+        setIsAddColumnModalOpen,
+        handleAddColumns,
+        handleRemoveColumn,
+        sensors,
+        handleDragEnd,
+    } = TableColumnsManagement({
+        initialColumnOrder: ['id', 'name', 'status', 'actions', 'add'],
+        initialColumnVisibility: {
+            'id': true,
+            'name': true,
+            'user': false,
+            'status': true,
+            'duration': false,
+            'actions': true,
+            'add': true,
+        }
+    })
 
     const availableColumns = useMemo(() => {
         return [
@@ -81,7 +92,7 @@ export default function Table1() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Name
@@ -101,7 +112,7 @@ export default function Table1() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Duration
@@ -121,7 +132,7 @@ export default function Table1() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     Status
@@ -141,7 +152,7 @@ export default function Table1() {
                         column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        column.toggleVisibility(false);
+                        handleRemoveColumn(column.id);
                     }}
                 >
                     User
@@ -189,37 +200,7 @@ export default function Table1() {
     });
 
     /*console.log('table1 sorting state:', table.getState().sorting);*/
-
-    const handleAddColumns = (columns: ColumnOption[]) => {
-        setColumnVisibility(prev => ({
-            ...prev,
-            ...Object.fromEntries(columns.map(column => [column.value, true]))
-        }));
-        /*console.log('columnVisibility', columnVisibility);*/
-        setColumnOrder(prevOrder => {
-            const newColumns = columns.map(column => column.value);
-            const initialColumns = prevOrder.filter(column => column !== 'add');
-            return [...initialColumns, ...newColumns, "add"];
-            
-        });
-        setIsAddColumnModalOpen(false);
-    };
-
-    const sensors = useSensors(
-        useSensor(PointerSensor)
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-        if (over && active.id !== over.id) {
-            const oldIndex = columnOrder.indexOf(active.id.toString());
-            const newIndex = columnOrder.indexOf(over.id.toString());
-            const newColumnOrder = [...columnOrder];
-            newColumnOrder.splice(oldIndex, 1);
-            newColumnOrder.splice(newIndex, 0, active.id.toString());
-            setColumnOrder(newColumnOrder);
-        }
-    };
+    console.log('Table1 columnOrder:', columnOrder);
 
     return (
         <>
