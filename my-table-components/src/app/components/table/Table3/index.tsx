@@ -38,26 +38,28 @@ export default function Table3() {
             'name': true,
             'status': true,
             'duration': false,
+            'user': false,
             'actions': true,
+            'updatedTime': false,
             'add': true,
         }
     })
 
-    const availableColumns = useMemo(() => {
-        return [
-                { value: 'actions', label: 'Actions' },
-                { value: 'duration', label: 'Duration' },
-                { value: 'id', label: 'Id' },
-                { value: 'name', label: 'Name' },
-                { value: 'status', label: 'Status' },
-        ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
-    }, [columnVisibility]);
-
-    
-
     useEffect(() => {
         setData(table3Data as WorkflowTaskAnalysis[]);
     }, []);
+
+    const availableColumns = useMemo(() => {
+        if (data.length === 0) return [];
+        // get the keys of the first object in the array and filter out the ones which columnVisibility is false and the ones that are inside analyses
+        return Object.keys(data[0])
+            .map(key => ({
+                value: key,
+                label: key.charAt(0).toUpperCase() + key.slice(1)
+            }))
+            .filter(column => column.value !== 'analyses' && !columnVisibility[column.value as keyof typeof columnVisibility])
+            .sort((a, b) => a.value.localeCompare(b.label));
+    }, [data, columnVisibility]);
 
     const columns = useMemo(() => [
         columnHelper.display({
@@ -152,6 +154,45 @@ export default function Table3() {
                     }}
                 >
                     Duration
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('user', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true}
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    User
+                </ColumnHeader>
+            ),
+        }),
+        columnHelper.accessor('updatedTime', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Updated Time
                 </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',

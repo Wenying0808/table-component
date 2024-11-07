@@ -46,8 +46,22 @@ export default function Table1() {
         }
     })
 
+    useEffect(() => {
+        setData(table1Data as BaseAnalysis[]);
+    }, []);
+
+    // define the options for the add column modal dropdown menu
     const availableColumns = useMemo(() => {
-        return [
+        if (data.length === 0) return [];
+        // get the keys of the first object in the array and filter out the ones which columnVisibility is false
+        return Object.keys(data[0])
+            .map(key => ({
+                value: key,
+                label: key.charAt(0).toUpperCase() + key.slice(1)
+            }))
+            .filter(column => !columnVisibility[column.value as keyof typeof columnVisibility])
+            .sort((a, b) => a.value.localeCompare(b.label));
+        /*return [
                 { value: 'actions', label: 'Actions' },
                 { value: 'duration', label: 'Duration' },
                 { value: 'id', label: 'Id' },
@@ -55,11 +69,8 @@ export default function Table1() {
                 { value: 'status', label: 'Status' },
                 { value: 'user', label: 'User' },
         ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
-    }, [columnVisibility]);
-
-    useEffect(() => {
-        setData(table1Data as BaseAnalysis[]);
-    }, []);
+        */
+    }, [data, columnVisibility]);
 
     const columns = useMemo(() => [
         columnHelper.accessor('id', {
@@ -156,6 +167,26 @@ export default function Table1() {
                     }}
                 >
                     User
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('updatedTime', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Updated Time
                 </ColumnHeader>
             ),
             sortingFn: 'alphanumeric',

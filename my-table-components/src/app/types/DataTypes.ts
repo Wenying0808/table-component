@@ -1,5 +1,3 @@
-
-
 export type BaseAnalysis = {
     id: string;
     name: string;

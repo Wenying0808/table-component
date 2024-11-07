@@ -6,6 +6,7 @@
       "actions": ["Download", "Archive", "Report"],
       "updatedTime": "2024-10-20T14:30:00Z",
       "duration": "2h 30m",
+      "user": "John Doe",
       "appAnalyses": [
         {
           "id": "aa1",
@@ -40,6 +41,7 @@
       "actions": ["Pause", "Archive"],
       "updatedTime": "2024-10-21T09:00:00Z",
       "duration": "2h",
+      "user": "Oliver Smith",
       "appAnalyses": [
        {
           "id": "aa4",

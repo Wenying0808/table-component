@@ -78,7 +78,7 @@ a {
   height: fit-content;
 }
 
-.table1 {
+.table1, .table2, .table3 {
   height: 60vh;
   overflow-y: auto;
   display: block; 
