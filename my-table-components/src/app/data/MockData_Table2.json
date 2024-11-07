@@ -60,5 +60,59 @@
           "duration": ""
         }
       ]
+    },
+    {
+      "id": "wa3",
+      "name": "Hit Expansion Test",
+      "status": "Failed",
+      "actions": ["Report"],
+      "updatedTime": "2024-09-20T14:30:00Z",
+      "duration": "30m",
+      "user": "Linda Smith",
+      "appAnalyses": [
+        {
+          "id": "aa6",
+          "name": "IGX-Profile",
+          "status": "Failed",
+          "actions": ["Report"],
+          "updatedTime": "2024-09-20T12:00:00Z",
+          "duration": "30m"
+        }
+      ]
+    },
+    {
+      "id": "wa4",
+      "name": "Enrichement Analysis",
+      "status": "Completed",
+      "actions": ["Download", "Archive", "Report"],
+      "updatedTime": "2024-11-20T14:30:00Z",
+      "duration": "2h 30m",
+      "user": "John Doe",
+      "appAnalyses": [
+        {
+          "id": "aa7",
+          "name": "IGX-Profile",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-11-20T12:00:00Z",
+          "duration": "1h 5m"
+        },
+        {
+          "id": "aa8",
+          "name": "IGX-Cluster",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-11-19T16:45:00Z",
+          "duration": "15m"
+        },
+        {
+          "id": "aa9",
+          "name": "IGX-Track",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-11-19T16:45:00Z",
+          "duration": "35m"
+        }
+      ]
     }
   ]

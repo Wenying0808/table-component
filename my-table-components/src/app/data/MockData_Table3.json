@@ -190,5 +190,84 @@
           ]
         }
       ]
+    },
+    {
+      "id": "wa3",
+      "name": "Hit Selection 2",
+      "status": "Running",
+      "actions": ["Pause", "Archive"],
+      "updatedTime": "2024-10-25T09:00:00Z",
+      "duration": "2h",
+      "user": "Oliver Smith",
+      "analyses": [
+       {
+          "id": "aa4",
+          "name": "IGX-Profile",
+          "status": "Completed",
+          "actions": ["View", "Report"],
+          "updatedTime": "2024-10-25T12:00:00Z",
+          "duration": "1h",
+          "tasks": [
+            {
+              "id": "task1",
+              "name": "Task 1",
+              "status": "Completed",
+              "actions": ["View", "Report"],
+              "updatedTime": "2024-10-25T12:00:00Z",
+              "duration": "25m"
+            },
+            {
+                "id": "task2",
+                "name": "Task 2",
+                "status": "Completed",
+                "actions": ["View", "Report"],
+                "updatedTime": "2024-10-25T12:00:00Z",
+                "duration": "25m"
+              },
+              {
+                "id": "task3",
+                "name": "Task 3",
+                "status": "Completed",
+                "actions": ["View", "Report"],
+                "updatedTime": "2024-10-25T12:00:00Z",
+                "duration": "15m"
+              }
+          ]
+        },
+        {
+          "id": "aa5",
+          "name": "IGX-Cluster",
+          "status": "Running",
+          "actions": ["Stop"],
+          "updatedTime": "2024-10-20T12:00:00Z",
+          "duration": "",
+          "tasks": [
+            {
+              "id": "task1",
+              "name": "Task 1",
+              "status": "Running",
+              "actions": [],
+              "updatedTime": "2024-10-20T12:00:00Z",
+              "duration": ""
+            },
+            {
+                "id": "task2",
+                "name": "Task 2",
+                "status": "Queued",
+                "actions": [],
+                "updatedTime": "2024-10-20T12:00:00Z",
+                "duration": ""
+              },
+              {
+                "id": "task3",
+                "name": "Task 3",
+                "status": "Queued",
+                "actions": [],
+                "updatedTime": "2024-10-20T12:00:00Z",
+                "duration": ""
+              }
+          ]
+        }
+      ]
     }
   ]
