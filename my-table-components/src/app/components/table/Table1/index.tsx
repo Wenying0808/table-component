@@ -232,7 +232,7 @@ export default function Table1() {
     });
 
     /*console.log('table1 sorting state:', table.getState().sorting);*/
-    console.log('Table1 columnOrder:', columnOrder);
+    /*console.log('Table1 columnOrder:', columnOrder);*/
 
     return (
         <>

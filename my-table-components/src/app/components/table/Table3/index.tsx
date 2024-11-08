@@ -215,7 +215,7 @@ export default function Table3() {
         columns,
         data,
         getSubRows: (row: Table3RowData) => {
-            console.log('getSubRows called with:', row);
+            /*console.log('getSubRows called with:', row);*/
             if (row && 'analyses' in row) {
                 return row.analyses;
             }
