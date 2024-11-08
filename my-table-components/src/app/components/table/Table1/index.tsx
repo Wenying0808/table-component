@@ -42,6 +42,7 @@ export default function Table1() {
             'status': true,
             'duration': false,
             'actions': true,
+            'updatedTime': false,
             'add': true,
         }
     })

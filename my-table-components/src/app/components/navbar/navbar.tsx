@@ -11,21 +11,21 @@ export default function Navbar() {
             </IconButton>
             <a
             className={styles.primary}
-            href="/table1"
+            href="/pages/table1"
             rel="noopener noreferrer"
             >
             Table 1
             </a>
             <a
             className={styles.primary}
-            href="/table2"
+            href="/pages/table2"
             rel="noopener noreferrer"
             >
             Table 2
             </a>
             <a
             className={styles.primary}
-            href="/table3"
+            href="/pages/table3"
             rel="noopener noreferrer"
             >
             Table 3

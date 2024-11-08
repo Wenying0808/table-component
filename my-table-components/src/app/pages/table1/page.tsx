@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "../components/navbar/navbar";
-import Table1 from "../components/table/Table1";
+import Navbar from "@/app/components/navbar/navbar";
+import Table1 from "@/app/components/table/Table1";
 
 
 export default function Table1Page() {
