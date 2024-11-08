@@ -4,7 +4,7 @@ export type BaseAnalysis = {
     status: string;
     actions: string[];
     updatedTime: string;
-    duration: string;
+    duration: number | "";
     user?: string;
 }
 

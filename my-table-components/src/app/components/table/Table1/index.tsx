@@ -1,5 +1,5 @@
 import { useReactTable, getCoreRowModel, createColumnHelper, flexRender, getSortedRowModel, SortingState } from '@tanstack/react-table'
-import table1Data from '../../../data/MockData_Table1.json';
+/*import table1Data from '../../../data/MockData_Table1.json';*/
 import { useMemo, useState, useEffect } from 'react';
 import React from 'react';
 import { TableColumnHeaderRow } from '../TableColumnHeaderRow';
@@ -15,11 +15,11 @@ import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortabl
 import TableColumnsManagement from '@/app/tableManagement/tableColumnsManagement';
 
 
-export default function Table1() {
+export default function Table1({ table1Data }: { table1Data: BaseAnalysis[] }) {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
     const [sorting, setSorting] = useState<SortingState>([ 
-        { id: 'id', desc: true } 
+        { id: 'name', desc: false }
     ]);
 
     const {
@@ -48,8 +48,8 @@ export default function Table1() {
     })
 
     useEffect(() => {
-        setData(table1Data as BaseAnalysis[]);
-    }, []);
+        setData(table1Data);
+    }, [table1Data]);
 
     // define the options for the add column modal dropdown menu
     const availableColumns = useMemo(() => {
@@ -60,38 +60,11 @@ export default function Table1() {
                 value: key,
                 label: key.charAt(0).toUpperCase() + key.slice(1)
             }))
-            .filter(column => !columnVisibility[column.value as keyof typeof columnVisibility])
+            .filter(column => column.value !== "_id" &&!columnVisibility[column.value as keyof typeof columnVisibility])
             .sort((a, b) => a.value.localeCompare(b.label));
-        /*return [
-                { value: 'actions', label: 'Actions' },
-                { value: 'duration', label: 'Duration' },
-                { value: 'id', label: 'Id' },
-                { value: 'name', label: 'Name' },
-                { value: 'status', label: 'Status' },
-                { value: 'user', label: 'User' },
-        ].filter(column => !columnVisibility[column.value as keyof typeof columnVisibility]);
-        */
     }, [data, columnVisibility]);
 
     const columns = useMemo(() => [
-        columnHelper.accessor('id', {
-            cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={false}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                >
-                    Id
-                </ColumnHeader>
-            ),
-            sortingFn: 'alphanumeric',
-            enableHiding: false,
-        }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
             header: ({ column }) => (

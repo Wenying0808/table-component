@@ -5,7 +5,7 @@
       "status": "Completed",
       "actions": ["Download", "Archive", "Report"],
       "updatedTime": "2024-10-20T14:30:00Z",
-      "duration": "2h 30m",
+      "duration": 150,
       "user": "John Doe",
       "appAnalyses": [
         {
@@ -14,7 +14,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-20T12:00:00Z",
-          "duration": "1h 5m"
+          "duration": 65
         },
         {
           "id": "aa2",
@@ -22,7 +22,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-19T16:45:00Z",
-          "duration": "15m"
+          "duration": 15
         },
         {
           "id": "aa3",
@@ -30,7 +30,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-19T16:45:00Z",
-          "duration": "35m"
+          "duration": 35
         }
       ]
     },
@@ -40,7 +40,7 @@
       "status": "Running",
       "actions": ["Pause", "Archive"],
       "updatedTime": "2024-10-21T09:00:00Z",
-      "duration": "2h",
+      "duration": 120,
       "user": "Oliver Smith",
       "appAnalyses": [
        {
@@ -49,7 +49,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-20T12:00:00Z",
-          "duration": "1h"
+          "duration": 60
         },
         {
           "id": "aa5",
@@ -67,7 +67,7 @@
       "status": "Failed",
       "actions": ["Report"],
       "updatedTime": "2024-09-20T14:30:00Z",
-      "duration": "30m",
+      "duration": 30,
       "user": "Linda Smith",
       "appAnalyses": [
         {
@@ -76,7 +76,7 @@
           "status": "Failed",
           "actions": ["Report"],
           "updatedTime": "2024-09-20T12:00:00Z",
-          "duration": "30m"
+          "duration": 30
         }
       ]
     },
@@ -86,7 +86,7 @@
       "status": "Completed",
       "actions": ["Download", "Archive", "Report"],
       "updatedTime": "2024-11-20T14:30:00Z",
-      "duration": "2h 30m",
+      "duration": 30,
       "user": "John Doe",
       "appAnalyses": [
         {
@@ -95,7 +95,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-11-20T12:00:00Z",
-          "duration": "1h 5m"
+          "duration": 65
         },
         {
           "id": "aa8",
@@ -103,7 +103,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-11-19T16:45:00Z",
-          "duration": "15m"
+          "duration": 15
         },
         {
           "id": "aa9",
@@ -111,7 +111,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-11-19T16:45:00Z",
-          "duration": "35m"
+          "duration": 35
         }
       ]
     }

@@ -5,7 +5,7 @@
       "status": "Completed",
       "actions": ["Download", "Archive", "Report"],
       "updatedTime": "2024-10-20T14:30:00Z",
-      "duration": "2h 30m",
+      "duration": 150,
       "user": "John Doe",
       "analyses": [
         {
@@ -14,7 +14,7 @@
           "status": "Completed",
           "actions": ["Open", "Report"],
           "updatedTime": "2024-10-20T12:00:00Z",
-          "duration": "1h 5m",
+          "duration": 65,
           "tasks": [
             {
               "id": "task1",
@@ -22,7 +22,7 @@
               "status": "Completed",
               "actions": ["View", "Report"],
               "updatedTime": "2024-10-20T12:00:00Z",
-              "duration": "25m"
+              "duration": 25
             },
             {
                 "id": "task2",
@@ -30,7 +30,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "25m"
+                "duration": 25
               },
               {
                 "id": "task3",
@@ -38,7 +38,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "15m"
+                "duration": 15
               }
           ]
         },
@@ -48,7 +48,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-19T16:45:00Z",
-          "duration": "15m",
+          "duration": 15,
           "tasks": [
             {
               "id": "task1",
@@ -56,7 +56,7 @@
               "status": "Completed",
               "actions": ["View", "Report"],
               "updatedTime": "2024-10-20T12:00:00Z",
-              "duration": "25m"
+              "duration": 25
             },
             {
                 "id": "task2",
@@ -64,7 +64,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "25m"
+                "duration": 25
               },
               {
                 "id": "task3",
@@ -72,7 +72,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "15m"
+                "duration": 15
               }
           ]
         },
@@ -82,7 +82,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-19T16:45:00Z",
-          "duration": "35m",
+          "duration": 35,
           "tasks": [
             {
               "id": "task1",
@@ -90,7 +90,7 @@
               "status": "Completed",
               "actions": ["View", "Report"],
               "updatedTime": "2024-10-20T12:00:00Z",
-              "duration": "25m"
+              "duration": 25
             },
             {
                 "id": "task2",
@@ -98,7 +98,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "25m"
+                "duration": 25
               },
               {
                 "id": "task3",
@@ -106,7 +106,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "15m"
+                "duration": 15
               }
           ]
         }
@@ -118,7 +118,7 @@
       "status": "Running",
       "actions": ["Pause", "Archive"],
       "updatedTime": "2024-10-21T09:00:00Z",
-      "duration": "2h",
+      "duration": 120,
       "user": "Oliver Smith",
       "analyses": [
        {
@@ -127,7 +127,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-20T12:00:00Z",
-          "duration": "1h",
+          "duration": 60,
           "tasks": [
             {
               "id": "task1",
@@ -135,7 +135,7 @@
               "status": "Completed",
               "actions": ["View", "Report"],
               "updatedTime": "2024-10-20T12:00:00Z",
-              "duration": "25m"
+              "duration": 25
             },
             {
                 "id": "task2",
@@ -143,7 +143,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "25m"
+                "duration": 25
               },
               {
                 "id": "task3",
@@ -151,7 +151,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-20T12:00:00Z",
-                "duration": "15m"
+                "duration": 15
               }
           ]
         },
@@ -197,7 +197,7 @@
       "status": "Running",
       "actions": ["Pause", "Archive"],
       "updatedTime": "2024-10-25T09:00:00Z",
-      "duration": "2h",
+      "duration": 120,
       "user": "Oliver Smith",
       "analyses": [
        {
@@ -206,7 +206,7 @@
           "status": "Completed",
           "actions": ["View", "Report"],
           "updatedTime": "2024-10-25T12:00:00Z",
-          "duration": "1h",
+          "duration": 60,
           "tasks": [
             {
               "id": "task1",
@@ -214,7 +214,7 @@
               "status": "Completed",
               "actions": ["View", "Report"],
               "updatedTime": "2024-10-25T12:00:00Z",
-              "duration": "25m"
+              "duration": 25
             },
             {
                 "id": "task2",
@@ -222,7 +222,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-25T12:00:00Z",
-                "duration": "25m"
+                "duration": 25
               },
               {
                 "id": "task3",
@@ -230,7 +230,7 @@
                 "status": "Completed",
                 "actions": ["View", "Report"],
                 "updatedTime": "2024-10-25T12:00:00Z",
-                "duration": "15m"
+                "duration": 15
               }
           ]
         },
