@@ -1,6 +1,6 @@
 # Table Components
 
-https://emotion.sh/docs/introduction
+![Table Demo](./table-demo.gif)
 
 ## Table 1
 
@@ -26,3 +26,12 @@ https://emotion.sh/docs/introduction
 - Reorder columns
 - Add/remove columns
 - Expand/collapse rows
+
+## Stack
+
+- React
+- Typescript
+- Next.js
+- MUI
+- Tanstack Table
+- MongoDB
