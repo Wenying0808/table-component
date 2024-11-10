@@ -7,6 +7,7 @@ import { Button, IconButton, Input, Tooltip } from "@mui/material";
 import { colors } from "@/app/styles/colors";
 import ClearIcon from '@mui/icons-material/Clear';
 import Loader from "@/app/components/loader";
+import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
 
 
 export default function Table1Page() {
@@ -134,7 +135,7 @@ export default function Table1Page() {
                         {isAddingData ? 'Adding Data...' : 'Add Data to Table'}
                     </Button>
                 </div>
-                {isDataLoading ? <Loader /> : <Table1 table1Data={data} />}
+                {isDataLoading ? <Loader /> : data.length > 0 ? <Table1 table1Data={data} /> : <PlaceholderNoResult />}
             </main>
         </div>
     )
