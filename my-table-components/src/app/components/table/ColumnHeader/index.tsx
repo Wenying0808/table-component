@@ -8,7 +8,7 @@ import { colors } from '../../../styles/colors';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-export default function ColumnHeader({ id, children, isSortable = false, sortingState, columnIsRemoveable,handleSorting, handleRemoveColumn } : TableColumnHeaderProps ) {
+export default function ColumnHeader({ id, children, isSortable = false, sortingState, columnIsRemoveable, handleSorting, handleRemoveColumn } : TableColumnHeaderProps ) {
     const [isHovered, setIsHovered] = useState(false);
     const getSortingIcon = (sortingDirection: SortingDirection) => {
         if (sortingDirection === 'asc') return <ArrowUpwardIcon onClick={handleSorting} style={{color: colors.azure, cursor: 'pointer'}} />;
@@ -54,7 +54,13 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
             ref={setNodeRef}
             
         >
-            <span>{children}</span>
+            <div style={{ 
+                overflow: 'hidden' ,
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis'
+            }}>
+                {children}
+            </div>
             {isSortable && (sortingState || isHovered) &&
                 getSortingIcon(sortingState)
             }

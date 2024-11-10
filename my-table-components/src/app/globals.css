@@ -121,6 +121,10 @@ th {
 td {
   color: var(--black);
   padding: 0 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 150px;
 }
 
 /*remove right/left padding for the expandable cell*/
