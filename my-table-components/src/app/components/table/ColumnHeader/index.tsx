@@ -4,7 +4,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { SortingDirection, TableColumnHeaderProps } from '../../../types/TableTypes';
 import { useState } from 'react';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 

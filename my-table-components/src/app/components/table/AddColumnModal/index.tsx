@@ -1,7 +1,7 @@
 import { AddColumnModalProps, ColumnOption } from '@/app/types/TableTypes';
 import { Button, Modal, Typography } from '@mui/material';
 import Select, { MultiValue } from 'react-select';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 import { useState } from 'react';
 
 export const AddColumnModal: React.FC<AddColumnModalProps> = ({ open, onClose, columnOptions, onAddColumns }) => {

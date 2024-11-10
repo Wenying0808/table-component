@@ -1,5 +1,5 @@
 import { TableRowProps, ExpandableRow } from '../../../types/TableTypes';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 
 export const Table2Row = <T extends ExpandableRow>({ row, children }: TableRowProps<T>) => {
     const rowStyles = {

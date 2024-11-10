@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 import { Button, Menu, MenuItem } from '@mui/material';
 import React from 'react';
 

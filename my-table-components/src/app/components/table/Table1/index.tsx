@@ -19,7 +19,7 @@ export default function Table1({ table1Data }: { table1Data: BaseAnalysis[] }) {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
     const [sorting, setSorting] = useState<SortingState>([ 
-        { id: 'name', desc: false }
+        { id: 'updatedTime', desc: true }
     ]);
 
     const {

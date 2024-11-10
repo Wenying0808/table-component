@@ -1,7 +1,7 @@
 import { IconButton, Tooltip } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { ColumnHeaderAddProps } from '@/app/types/TableTypes';
-import { colors } from '../../styles/colors';
+import { colors } from '../../../styles/colors';
 
 export const ColumnHeaderAdd: React.FC<ColumnHeaderAddProps > = ({ onClick })  => {
     return (

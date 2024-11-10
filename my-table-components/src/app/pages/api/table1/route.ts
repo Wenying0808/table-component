@@ -11,3 +11,30 @@ export async function GET() {
         return NextResponse.json({ message: 'Failed to fetch finance data', error })
     }
 }
+
+export async function POST(request: Request) {
+    try {
+        await connectToMongoDB();
+        const body = await request.json();
+        // validate the required data
+        if (!body.name || !body.status || !body.user){
+            return NextResponse.json({ message: 'Missing required data' });
+        }
+        const newDocument = {
+            ...body,
+            updatedTime: new Date().toISOString(),
+            actions: body.actions || [],
+            duration: body.duration || "",
+        }
+        const result = await Table1Model.collection.insertOne(newDocument);
+        if (result.acknowledged) {
+            // If insertion was successful, fetch the newly inserted document
+            const insertedDocument = await Table1Model.findOne({ _id: result.insertedId });
+            return NextResponse.json(insertedDocument, { status: 201 });
+        } else {
+            throw new Error('Document insertion failed');
+        }
+    } catch (error) {
+        return NextResponse.json({ message: 'Failed to add new analysis data', error });
+    }
+}
