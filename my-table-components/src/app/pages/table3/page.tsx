@@ -8,7 +8,6 @@ export default function Table3Page() {
         <div className="table-page">
             <Navbar />
             <main className="page-main">
-                <h1>Table 3</h1>
                 <Table3 />
             </main>
         </div>

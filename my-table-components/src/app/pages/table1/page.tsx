@@ -6,21 +6,28 @@ import { useEffect, useState } from "react";
 import { Button, IconButton, Input, Tooltip } from "@mui/material";
 import { colors } from "@/app/styles/colors";
 import ClearIcon from '@mui/icons-material/Clear';
+import Loader from "@/app/components/loader";
+
+
 export default function Table1Page() {
     const [data, setData] = useState([]);
+    const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
 
     const handleFetchData = async (search = searchValue) => {
         try{
+            setIsDataLoading(true);
             const searchQuery = search !== '' ? `?search=${encodeURIComponent(search)}` : '';
-            console.log("searchQuery:", searchQuery);
+            /*console.log("searchQuery:", searchQuery);*/
             const response = await fetch(`/pages/api/table1${searchQuery}`);
             const table1 = await response.json();
-            console.log("Fetched table1 data from db",table1);
+            /*console.log("Fetched table1 data from db",table1);*/
             return table1;
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            setIsDataLoading(false);
         }
     }
 
@@ -56,7 +63,7 @@ export default function Table1Page() {
     const handleNameSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try{
             const searchValue = e.target.value;
-            console.log("filter:", searchValue);
+            /*console.log("filter:", searchValue);*/
             setSearchValue(searchValue);
             const dataByQuery = await handleFetchData(searchValue);
             setData(dataByQuery);
@@ -64,7 +71,7 @@ export default function Table1Page() {
             console.error('Error searching by name:', error);
         }
     }
-    console.log("search value:", searchValue);
+    /*console.log("search value:", searchValue);*/
 
     const handleClearSearch = async () => {
         try{
@@ -101,13 +108,10 @@ export default function Table1Page() {
                             placeholder="Search by name..." 
                             value={searchValue}
                             onChange={handleNameSearch} 
+                            disableUnderline
                             sx={{
                                 width: 'fit-content', 
                                 color: colors.black,
-                                '&:before': { borderBottom: 'none' },
-                                '&:after': { borderBottom: 'none' },
-                                '&:hover:before': { borderBottom: 'none' },
-                                '&:hover:after': { borderBottom: 'none' },
                             }}
                         />
                         {searchValue && 
@@ -130,8 +134,7 @@ export default function Table1Page() {
                         {isAddingData ? 'Adding Data...' : 'Add Data to Table'}
                     </Button>
                 </div>
-
-                <Table1 table1Data={data} />
+                {isDataLoading ? <Loader /> : <Table1 table1Data={data} />}
             </main>
         </div>
     )

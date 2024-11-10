@@ -9,7 +9,6 @@ export default function Table2Page() {
         <div className="table-page">
             <Navbar />
             <main className="page-main">
-                <h1>Table 2</h1>
                 <Table2 />
             </main>
         </div>

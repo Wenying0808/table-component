@@ -47,7 +47,7 @@ a {
   --gray-alpha-200: rgba(var(--gray-rgb), 0.08);
   --gray-alpha-100: rgba(var(--gray-rgb), 0.05);
 
-  --button-primary-hover: #383838;
+  --button-primary-hover: #D9DFF2;
   --button-secondary-hover: #f2f2f2;
 
   display: flex;
@@ -55,7 +55,7 @@ a {
   align-items: center;
   justify-items: center;
   height: 100vh;
-  padding: 80px;
+  padding: 0;
   gap: 40px;
   font-family: var(--font-geist-sans);
 }
@@ -79,7 +79,7 @@ a {
 }
 
 .table1, .table2, .table3 {
-  height: 60vh;
+  height: 70vh;
   overflow-y: auto;
   display: block; 
 }

@@ -1,43 +1,47 @@
+'use client';
+
 import styles from "./navbar.module.css";
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { IconButton } from "@mui/material";
 import HomeIcon from '@mui/icons-material/Home';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Navbar() {
+    const pathname = usePathname();
+    
     return (
-        <div className={styles.ctas}>
+        <div className={styles.navbar}>
             <IconButton href="/" color="inherit">
                 <HomeIcon />
             </IconButton>
-            <a
-            className={styles.primary}
-            href="/pages/table1"
-            rel="noopener noreferrer"
+
+            <Link
+                className={`${styles.primary} ${pathname === '/pages/table1' ? styles.active : ''}`}
+                href="/pages/table1"
             >
-            Table 1
-            </a>
-            <a
-            className={styles.primary}
-            href="/pages/table2"
-            rel="noopener noreferrer"
+                Table 1
+            </Link>
+            <Link
+                className={`${styles.primary} ${pathname === '/pages/table2' ? styles.active : ''}`}
+                href="/pages/table2"
             >
-            Table 2
-            </a>
-            <a
-            className={styles.primary}
-            href="/pages/table3"
-            rel="noopener noreferrer"
+                Table 2
+            </Link>
+            <Link
+                className={`${styles.primary} ${pathname === '/pages/table3' ? styles.active : ''}`}
+                href="/pages/table3"
             >
-            Table 3
-            </a>
+                Table 3
+            </Link>
             <a
-            className={styles.secondary}
-            href="https://github.com/Wenying0808/table-component"
-            target="_blank"
-            rel="noopener noreferrer"
+                className={styles.secondary}
+                href="https://github.com/Wenying0808/table-component"
+                target="_blank"
+                rel="noopener noreferrer"
             >
-            <GitHubIcon />
-            Github
+                <GitHubIcon />
+                Github
             </a>
         </div>
     )

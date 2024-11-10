@@ -1,6 +1,6 @@
 export const colors = {
-  azure: '#3A53A4',
-  linkWater: '#D9DFF2',
+  azure: '#3A53A4', // primary
+  linkWater: '#D9DFF2', // hover
   salem: '#058F23', // completed
   moodyBlue: '#768BCE', // quedued
   scooter: '#44C4D8', // running
