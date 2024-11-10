@@ -2,10 +2,16 @@ import connectToMongoDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import Table1Model from "@/app/models/Table1";
 
-export async function GET() {
+export async function GET(request: Request) {
     try{
         await connectToMongoDB();
-        const table1Data = await Table1Model.find({});
+        const { searchParams } = new URL(request.url);
+        const searchQuery = searchParams.get('search');
+        let query = {};
+        if (searchQuery) {
+            query = { name: { $regex: searchQuery, $options: 'i' } };
+        }
+        const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);
     } catch (error) {
         return NextResponse.json({ message: 'Failed to fetch finance data', error })
