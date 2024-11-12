@@ -1,6 +1,6 @@
 import connectToMongoDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
-import Table1Model from "@/app/models/Table1";
+import Table2Model from "@/app/models/Table2";
 
 export async function GET(request: Request) {
     try{
@@ -11,10 +11,10 @@ export async function GET(request: Request) {
         if (searchQuery) {
             query = { name: { $regex: searchQuery, $options: 'i' } };
         }
-        const table1Data = await Table1Model.find(query);
-        return NextResponse.json(table1Data);
+        const table2Data = await Table2Model.find(query);
+        return NextResponse.json(table2Data);
     } catch (error) {
-        return NextResponse.json({ message: 'Table1:  Failed to fetch table data', error })
+        return NextResponse.json({ message: 'Table2:  Failed to fetch table data', error })
     }
 }
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         // validate the required data
         if (!body.name || !body.status || !body.user){
-            return NextResponse.json({ message: 'Table1: Missing required data to post' });
+            return NextResponse.json({ message: 'Table2: Missing required data to post' });
         }
         const newDocument = {
             ...body,
@@ -32,15 +32,15 @@ export async function POST(request: Request) {
             actions: body.actions || [],
             duration: body.duration || "",
         }
-        const result = await Table1Model.collection.insertOne(newDocument);
+        const result = await Table2Model.collection.insertOne(newDocument);
         if (result.acknowledged) {
             // If insertion was successful, fetch the newly inserted document
-            const insertedDocument = await Table1Model.findOne({ _id: result.insertedId });
+            const insertedDocument = await Table2Model.findOne({ _id: result.insertedId });
             return NextResponse.json(insertedDocument, { status: 201 });
         } else {
-            throw new Error('Table1: Document insertion failed');
+            throw new Error('Table2: Document insertion failed');
         }
     } catch (error) {
-        return NextResponse.json({ message: 'Table1: Failed to add new analysis data', error });
+        return NextResponse.json({ message: 'Table2: Failed to add new analysis data', error });
     }
 }
