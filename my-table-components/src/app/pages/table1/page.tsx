@@ -24,6 +24,7 @@ export default function Table1Page() {
             const response = await fetch(`/pages/api/table1${searchQuery}`);
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
+            setData(table1);
             return table1;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -52,8 +53,7 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to add data');
             }
-            const updatedData = await handleFetchData();
-            setData(updatedData);
+            await handleFetchData();
         } catch (error) {
             console.error('Error adding data:', error);
         } finally {
@@ -66,8 +66,7 @@ export default function Table1Page() {
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
             setSearchValue(searchValue);
-            const dataByQuery = await handleFetchData(searchValue);
-            setData(dataByQuery);
+            await handleFetchData(searchValue);
         } catch (error) {
             console.error('Error searching by name:', error);
         }
