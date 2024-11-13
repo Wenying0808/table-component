@@ -84,7 +84,7 @@ export default function Table1Page() {
     }
 
     useEffect(() => {
-        handleFetchData().then((d) => setData(d));
+        handleFetchData();
     }, []);
 
     return (
