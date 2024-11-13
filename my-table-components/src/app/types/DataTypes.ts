@@ -1,5 +1,6 @@
 export type BaseAnalysis = {
-    id: string;
+    _id?: string; // for MongoDB
+    id?: string;
     name: string;
     status: string;
     actions: string[];
