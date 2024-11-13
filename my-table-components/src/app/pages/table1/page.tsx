@@ -1,21 +1,230 @@
 "use client";
 
-import Navbar from "@/app/components/navbar/navbar";
-import Table1 from "@/app/components/table/Table1";
-import { useEffect, useState } from "react";
-import { Button, IconButton, Input, Tooltip } from "@mui/material";
-import { colors } from "@/app/styles/colors";
-import ClearIcon from '@mui/icons-material/Clear';
-import Loader from "@/app/components/loader";
-import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
+// React and core dependencies
+import { useEffect, useMemo, useState } from "react";
 
+// External UI libraries
+import { Button, IconButton, Input, Tooltip } from "@mui/material";
+import ClearIcon from '@mui/icons-material/Clear';
+
+// Table related external libraries
+import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
+import { DndContext } from "@dnd-kit/core";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+
+// Internal components
+import Navbar from "@/app/components/navbar/navbar";
+import Loader from "@/app/components/loader";
+
+//Table Copmonents
+import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
+import ColumnHeader from "@/app/components/table/ColumnHeader";
+import { TableCellStatus } from "@/app/components/table/StatusCell";
+import { TableCellActions } from "@/app/components/table/ActionsCell";
+import { ColumnHeaderAdd } from "@/app/components/table/ColumnHeaderAdd";
+import { AddColumnModal } from "@/app/components/table/AddColumnModal";
+import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
+import { Table1Row } from "@/app/components/table/Table1Row";
+
+// Utilities and types
+import { colors } from "@/app/styles/colors";
+import { BaseAnalysis } from "@/app/types/DataTypes";
+import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
 
 export default function Table1Page() {
+    const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState([]);
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>('');
+    const [sorting, setSorting] = useState<SortingState>([ 
+        { id: 'updatedTime', desc: true }
+    ]);
 
+    const {
+        columnVisibility,
+        setColumnVisibility,
+        columnOrder,
+        setColumnOrder,
+
+        // Column modal state and handlers
+        isAddColumnModalOpen,
+        setIsAddColumnModalOpen,
+        handleAddColumns,
+        handleRemoveColumn,
+
+        // Drag and drop functionality
+        sensors,
+        handleDragEnd,
+    } = TableColumnsManagement({
+        initialColumnOrder: ['id', 'name', 'status', 'actions', 'add'],
+        initialColumnVisibility: {
+            'id': true,
+            'name': true,
+            'user': false,
+            'status': true,
+            'duration': false,
+            'actions': true,
+            'updatedTime': false,
+            'add': true,
+        }
+    })
+
+    // column definitions
+    const availableColumns = useMemo(() => {
+        if (data.length === 0) return [];
+        // get the keys of the first object in the array and filter out the ones which columnVisibility is false
+        return Object.keys(data[0])
+            .map(key => ({
+                value: key,
+                label: key.charAt(0).toUpperCase() + key.slice(1)
+            }))
+            .filter(column => column.value !== "_id" &&!columnVisibility[column.value as keyof typeof columnVisibility])
+            .sort((a, b) => a.value.localeCompare(b.label));
+    }, [data, columnVisibility]);
+
+    const columns = useMemo(() => [
+        columnHelper.accessor('name', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Name
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('duration', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Duration
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric'
+        }),
+        columnHelper.accessor('status', {
+            cell: info => <TableCellStatus data={info.getValue()} />,
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Status
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric'
+        }),
+        columnHelper.accessor('user', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    User
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('updatedTime', {
+            cell: info => info.getValue(),
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={true} 
+                    sortingState={column.getIsSorted()}
+                    columnIsRemoveable={true}
+                    handleSorting={() => {
+                        column.toggleSorting();
+                    }}
+                    handleRemoveColumn={() => {
+                        handleRemoveColumn(column.id);
+                    }}
+                >
+                    Updated Time
+                </ColumnHeader>
+            ),
+            sortingFn: 'alphanumeric',
+        }),
+        columnHelper.accessor('actions', {
+            cell: info => <TableCellActions data={info.getValue()} />,
+            header: ({ column }) => (
+                <ColumnHeader 
+                    id={column.id}
+                    isSortable={false}
+                    columnIsRemoveable={false}
+                >
+                    Actions
+                </ColumnHeader>
+            )
+        }),
+        columnHelper.display({
+            id: 'add',
+            cell: () => "",
+            header: () => (
+                <ColumnHeaderAdd 
+                    onClick={() => setIsAddColumnModalOpen(true)} 
+                />
+            ),
+            enableHiding: false,
+        })
+    ], []);
+
+    // table definition
+    const table = useReactTable({ 
+        columns,
+        data,
+        state:{
+            columnOrder,
+            sorting,
+            columnVisibility,
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        onColumnOrderChange: setColumnOrder,
+        onSortingChange: setSorting,
+        onColumnVisibilityChange: setColumnVisibility,
+    });
+
+    // data fetching and handling
     const handleFetchData = async (search = searchValue) => {
         try{
             setIsDataLoading(true);
@@ -61,6 +270,8 @@ export default function Table1Page() {
         }
     }
 
+    // Search Functions
+
     const handleNameSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try{
             const searchValue = e.target.value;
@@ -86,6 +297,7 @@ export default function Table1Page() {
     useEffect(() => {
         handleFetchData();
     }, []);
+
 
     return (
         <div className="table-page">
@@ -134,7 +346,58 @@ export default function Table1Page() {
                         {isAddingData ? 'Adding Data...' : 'Add Data to Table'}
                     </Button>
                 </div>
-                {isDataLoading ? <Loader /> : data.length > 0 ? <Table1 table1Data={data} /> : <PlaceholderNoResult />}
+                {isDataLoading ? 
+                    <Loader /> : 
+                    data.length > 0 ? 
+                    <>
+                    <AddColumnModal 
+                        open={isAddColumnModalOpen} 
+                        onClose={() => setIsAddColumnModalOpen(false)} 
+                        columnOptions={availableColumns}
+                        onAddColumns={handleAddColumns}
+                    />
+                    <DndContext
+                        sensors={sensors}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <table className="table1">
+                            <thead className="sticky-column-header">
+                            {table.getHeaderGroups().map(headerGroup => (
+                                <TableColumnHeaderRow key={headerGroup.id}>
+                                    <SortableContext
+                                        items={headerGroup.headers.map(header => header.id)}
+                                        strategy={horizontalListSortingStrategy}
+                                    >
+                                        {headerGroup.headers.map(header => (
+                                            <th key={header.id}>
+                                                {flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                            </th>
+                                        ))}
+                                    </SortableContext>
+                                </TableColumnHeaderRow>
+                            ))}
+                            </thead>
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <Table1Row key={row.id}>
+                                        {row.getVisibleCells().map(cell => (
+                                            <td key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </Table1Row>
+                                ))}
+                            </tbody>
+                        </table>
+                    </DndContext>
+                </>:
+                    <PlaceholderNoResult />
+                }
             </main>
         </div>
     )
