@@ -26,5 +26,5 @@ export type AppTaskAnalysis = BaseAnalysis & {
 };
 // Table 3 - level 1: workflow
 export type WorkflowTaskAnalysis = BaseAnalysis & {
-    analyses?: AppTaskAnalysis[];
+    appAnalyses?: AppTaskAnalysis[];
 }

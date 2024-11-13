@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 interface ITable1 extends Document {
     _id: mongoose.Types.ObjectId;
     name: string;
-    status: string;
+    status: 'Queued' | 'Running' | 'Completed' | 'Failed';
     actions: string[];
     updatedTime: string;
     duration: number; // mins
