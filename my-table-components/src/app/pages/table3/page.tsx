@@ -17,7 +17,6 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, Row, SortingState, useReactTable } from "@tanstack/react-table";
 import React, { useEffect } from "react";
 import { useMemo, useState } from "react";
-import table3Data from "@/app/data/MockData_Table3.json";
 
 export default function Table3Page() {
     const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();

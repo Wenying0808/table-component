@@ -2,7 +2,7 @@ export type BaseAnalysis = {
     _id?: string; // for MongoDB
     id?: string;
     name: string;
-    status: string;
+    status: 'Queued' | 'Running' | 'Completed' | 'Failed';
     actions: string[];
     updatedTime: string;
     duration: number | "";
@@ -27,4 +27,23 @@ export type AppTaskAnalysis = BaseAnalysis & {
 // Table 3 - level 1: workflow
 export type WorkflowTaskAnalysis = BaseAnalysis & {
     appAnalyses?: AppTaskAnalysis[];
+}
+
+
+export interface FilterParams {
+    name?: string;
+    status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
+    user?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface MongoTableDataQuery {
+    name?: { $regex: string; $options: string };
+    status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
+    user?: string;
+    updatedTime?: {
+        $gte?: Date;
+        $lte?: Date;
+    };
 }

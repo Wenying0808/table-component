@@ -1,15 +1,25 @@
 import connectToMongoDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import Table1Model from "@/app/models/Table1";
+import { MongoTableDataQuery } from "@/app/types/DataTypes";
 
 export async function GET(request: Request) {
     try{
         await connectToMongoDB();
         const { searchParams } = new URL(request.url);
-        const searchQuery = searchParams.get('search');
-        let query = {};
-        if (searchQuery) {
-            query = { name: { $regex: searchQuery, $options: 'i' } };
+        //query object
+        const query: MongoTableDataQuery = {};
+
+        // name filter
+        const nameFilter = searchParams.get('name');
+        if (nameFilter) {
+            query.name = { $regex: nameFilter, $options: 'i'};
+        }
+        
+        // status filter
+        const statusQuery = searchParams.get('status');
+        if (statusQuery && statusQuery !== 'All') {
+             query.status = statusQuery as 'Queued' | 'Running' | 'Completed' | 'Failed';
         }
         const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);

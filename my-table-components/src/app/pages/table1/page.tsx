@@ -4,8 +4,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 // External UI libraries
-import { Button, IconButton, Input, Tooltip } from "@mui/material";
+import { FormControl, IconButton, Input, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
 import ClearIcon from '@mui/icons-material/Clear';
+import { LoadingButton } from "@mui/lab";
 
 // Table related external libraries
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
@@ -15,6 +16,7 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 // Internal components
 import Navbar from "@/app/components/navbar/navbar";
 import Loader from "@/app/components/loader";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 //Table Copmonents
 import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
@@ -28,15 +30,17 @@ import { Table1Row } from "@/app/components/table/Table1Row";
 
 // Utilities and types
 import { colors } from "@/app/styles/colors";
-import { BaseAnalysis } from "@/app/types/DataTypes";
+import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+
 
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState([]);
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
-    const [searchValue, setSearchValue] = useState<string>('');
+    const [nameFilter, setNameFilter] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'updatedTime', desc: true }
     ]);
@@ -225,12 +229,22 @@ export default function Table1Page() {
     });
 
     // data fetching and handling
-    const handleFetchData = async (search = searchValue) => {
+    const handleFetchData = async (filters: FilterParams = {
+        name: nameFilter, 
+        status: statusFilter
+    }) => {
         try{
             setIsDataLoading(true);
-            const searchQuery = search !== '' ? `?search=${encodeURIComponent(search)}` : '';
-            /*console.log("searchQuery:", searchQuery);*/
-            const response = await fetch(`/pages/api/table1${searchQuery}`);
+
+            const params = new URLSearchParams();
+            if (filters.name) {
+                params.append('name', filters.name);
+            }
+            if (filters.status) {
+                params.append('status', filters.status);
+            }
+            const queryString = params.toString();
+            const response = await fetch(`/pages/api/table1?${queryString}`);
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
             setData(table1);
@@ -276,8 +290,8 @@ export default function Table1Page() {
         try{
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
-            setSearchValue(searchValue);
-            await handleFetchData(searchValue);
+            setNameFilter(searchValue);
+            await handleFetchData({ name: searchValue, status: statusFilter});
         } catch (error) {
             console.error('Error searching by name:', error);
         }
@@ -286,13 +300,19 @@ export default function Table1Page() {
 
     const handleClearSearch = async () => {
         try{
-            setSearchValue('');
-            const data = await handleFetchData('');
+            setNameFilter('');
+            const data = await handleFetchData({ name: '', status: statusFilter});
             setData(data);
         } catch (error) {
             console.error('Error clearing search:', error);
         }
     }
+
+    const handleStatusFilterChange = async (e: SelectChangeEvent<string>) => {
+        setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
+        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'});
+    }
+    
 
     useEffect(() => {
         handleFetchData();
@@ -318,7 +338,7 @@ export default function Table1Page() {
                     }}>
                         <Input 
                             placeholder="Search by name..." 
-                            value={searchValue}
+                            value={nameFilter}
                             onChange={handleNameSearch} 
                             disableUnderline
                             sx={{
@@ -326,7 +346,7 @@ export default function Table1Page() {
                                 color: colors.black,
                             }}
                         />
-                        {searchValue && 
+                        {nameFilter && 
                             <Tooltip title="Clear Search" placement="top">
                                 <IconButton onClick={handleClearSearch} size="small">
                                     <ClearIcon />
@@ -334,17 +354,39 @@ export default function Table1Page() {
                             </Tooltip>
                         }
                     </div>
-                    <Button 
-                        variant="contained" 
+                    <LoadingButton size="medium"
                         onClick={handleAddData}
-                        disabled={isAddingData}
+                        endIcon={<AddCircleIcon />}
+                        loading={isAddingData}
+                        loadingPosition="end"
+                        variant="contained"
                         sx={{
-                            width: 'fit-content',
-                            backgroundColor: isAddingData ? colors.moodyBlue : colors.azure
+                            color: colors.white,
+                            backgroundColor: colors.azure,
+                            '&:hover': {
+                                backgroundColor: colors.azure,
+                            }
                         }}
                     >
-                        {isAddingData ? 'Adding Data...' : 'Add Data to Table'}
-                    </Button>
+                        Add Data
+                    </LoadingButton>
+                    <FormControl>
+                        <InputLabel id="status-filter-label" sx={{ color: colors.alto}}>Status Filter</InputLabel>
+                        <Select
+                            labelId="status-filter-label"
+                            id="status-filter-select"
+                            value={statusFilter}
+                            label="Satatus"
+                            onChange={handleStatusFilterChange}
+                            sx={{ color: colors.alto, fontSize: '12px', width: '120px'}}
+                        >
+                            <MenuItem value={"All"}>All</MenuItem>
+                            <MenuItem value={"Completed"}>Completed</MenuItem>
+                            <MenuItem value={"Failed"}>Failed</MenuItem>
+                            <MenuItem value={"Queued"}>Queued</MenuItem>
+                            <MenuItem value={"Running"}>Running</MenuItem>
+                        </Select>
+                        </FormControl>
                 </div>
                 {isDataLoading ? 
                     <Loader /> : 
