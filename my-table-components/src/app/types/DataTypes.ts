@@ -29,7 +29,6 @@ export type WorkflowTaskAnalysis = BaseAnalysis & {
     appAnalyses?: AppTaskAnalysis[];
 }
 
-
 export interface FilterParams {
     name?: string;
     status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
@@ -38,6 +37,7 @@ export interface FilterParams {
     endDate?: string;
 }
 
+// used for MongoDB queries in the API
 export interface MongoTableDataQuery {
     name?: { $regex: string; $options: string };
     status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';

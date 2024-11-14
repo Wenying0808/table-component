@@ -21,6 +21,13 @@ export async function GET(request: Request) {
         if (statusQuery && statusQuery !== 'All') {
              query.status = statusQuery as 'Queued' | 'Running' | 'Completed' | 'Failed';
         }
+
+        // user filter
+        const userQuery = searchParams.get('user');
+        if (userQuery && statusQuery !== 'All') {
+            query.user = userQuery;
+        }
+
         const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);
     } catch (error) {

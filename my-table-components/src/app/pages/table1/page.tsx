@@ -4,9 +4,12 @@
 import { useEffect, useMemo, useState } from "react";
 
 // External UI libraries
-import { FormControl, IconButton, Input, InputLabel, MenuItem, Select, SelectChangeEvent, Tooltip } from "@mui/material";
-import ClearIcon from '@mui/icons-material/Clear';
+import { IconButton, Input, SelectChangeEvent, Tooltip } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import ClearIcon from '@mui/icons-material/Clear';
+import ScatterPlotOutlinedIcon from '@mui/icons-material/ScatterPlotOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
 // Table related external libraries
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
@@ -16,7 +19,7 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 // Internal components
 import Navbar from "@/app/components/navbar/navbar";
 import Loader from "@/app/components/loader";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { DataFilter, StatusFilterOptions, MenuItemOption } from "@/app/components/DataFilter";
 
 //Table Copmonents
 import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
@@ -30,17 +33,21 @@ import { Table1Row } from "@/app/components/table/Table1Row";
 
 // Utilities and types
 import { colors } from "@/app/styles/colors";
+import { spacing } from "@/app/styles/spacing";
+import { fonts } from "@/app/styles/fonts";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
 
 
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<BaseAnalysis[]>([]);
+    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>([{label: "All", value: "All"}]);
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [nameFilter, setNameFilter] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
+    const [userFilter, setUserFilter] = useState<string>('All');
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'updatedTime', desc: true }
     ]);
@@ -231,7 +238,8 @@ export default function Table1Page() {
     // data fetching and handling
     const handleFetchData = async (filters: FilterParams = {
         name: nameFilter, 
-        status: statusFilter
+        status: statusFilter,
+        user: userFilter
     }) => {
         try{
             setIsDataLoading(true);
@@ -242,6 +250,9 @@ export default function Table1Page() {
             }
             if (filters.status) {
                 params.append('status', filters.status);
+            }
+            if(filters.user) {
+                params.append('user', filters.user);
             }
             const queryString = params.toString();
             const response = await fetch(`/pages/api/table1?${queryString}`);
@@ -291,7 +302,7 @@ export default function Table1Page() {
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
             setNameFilter(searchValue);
-            await handleFetchData({ name: searchValue, status: statusFilter});
+            await handleFetchData({ name: searchValue, status: statusFilter, user: userFilter});
         } catch (error) {
             console.error('Error searching by name:', error);
         }
@@ -301,7 +312,7 @@ export default function Table1Page() {
     const handleClearSearch = async () => {
         try{
             setNameFilter('');
-            const data = await handleFetchData({ name: '', status: statusFilter});
+            const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter});
             setData(data);
         } catch (error) {
             console.error('Error clearing search:', error);
@@ -310,9 +321,13 @@ export default function Table1Page() {
 
     const handleStatusFilterChange = async (e: SelectChangeEvent<string>) => {
         setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
-        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'});
+        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter});
     }
-    
+
+    const handleUserFilterChange = async (e: SelectChangeEvent<string>) => {
+        setUserFilter(e.target.value);
+        await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value});
+    }
 
     useEffect(() => {
         handleFetchData();
@@ -324,7 +339,7 @@ export default function Table1Page() {
             <Navbar />
             <main className="page-main">
                 <div className="table-control-bar" 
-                    style={{ display: 'flex', alignItems: 'center', gap: '20px', width: 'fit-content'}}
+                    style={{ display: 'flex', alignItems: 'center', gap: '20px', width: 'fit-content',height: spacing.filter_component_height}}
                 >
                     <div style={{
                         display: 'flex', 
@@ -344,16 +359,31 @@ export default function Table1Page() {
                             sx={{
                                 width: 'fit-content', 
                                 color: colors.black,
+                                fontSize: fonts.filter_component_font_size,
                             }}
                         />
                         {nameFilter && 
                             <Tooltip title="Clear Search" placement="top">
-                                <IconButton onClick={handleClearSearch} size="small">
-                                    <ClearIcon />
+                                <IconButton onClick={handleClearSearch} sx={{ width: "24px", height: "24px"}}>
+                                    <ClearIcon sx={{ fontSize: "14px"}}/>
                                 </IconButton>
                             </Tooltip>
                         }
                     </div>
+                    <DataFilter 
+                        id="status-filter"
+                        value={statusFilter}
+                        icon={<ScatterPlotOutlinedIcon/>}
+                        options={StatusFilterOptions}
+                        onChange={handleStatusFilterChange}
+                    />
+                    <DataFilter 
+                        id="user-filter"
+                        value={userFilter}
+                        icon={<PersonOutlineIcon/>}
+                        options={userFilterOptions}
+                        onChange={handleUserFilterChange}
+                    />
                     <LoadingButton size="medium"
                         onClick={handleAddData}
                         endIcon={<AddCircleIcon />}
@@ -370,23 +400,6 @@ export default function Table1Page() {
                     >
                         Add Data
                     </LoadingButton>
-                    <FormControl>
-                        <InputLabel id="status-filter-label" sx={{ color: colors.alto}}>Status Filter</InputLabel>
-                        <Select
-                            labelId="status-filter-label"
-                            id="status-filter-select"
-                            value={statusFilter}
-                            label="Satatus"
-                            onChange={handleStatusFilterChange}
-                            sx={{ color: colors.alto, fontSize: '12px', width: '120px'}}
-                        >
-                            <MenuItem value={"All"}>All</MenuItem>
-                            <MenuItem value={"Completed"}>Completed</MenuItem>
-                            <MenuItem value={"Failed"}>Failed</MenuItem>
-                            <MenuItem value={"Queued"}>Queued</MenuItem>
-                            <MenuItem value={"Running"}>Running</MenuItem>
-                        </Select>
-                        </FormControl>
                 </div>
                 {isDataLoading ? 
                     <Loader /> : 
