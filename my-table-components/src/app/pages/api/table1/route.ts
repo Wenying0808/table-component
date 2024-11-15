@@ -24,10 +24,17 @@ export async function GET(request: Request) {
 
         // user filter
         const userQuery = searchParams.get('user');
-        if (userQuery && statusQuery !== 'All') {
+        if (userQuery && userQuery !== 'All') {
             query.user = userQuery;
         }
 
+        // date filter
+        /*const dateQuery = searchParams.get('date');
+        if (dateQuery) {
+            query.date = { $gte: new Date(dateQuery), $lte: new Date(dateQuery) };
+        }*/
+
+        console.log("table1query:", query);
         const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);
     } catch (error) {

@@ -33,8 +33,7 @@ export interface FilterParams {
     name?: string;
     status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
     user?: string;
-    startDate?: string;
-    endDate?: string;
+    date?: string;
 }
 
 // used for MongoDB queries in the API
@@ -42,8 +41,8 @@ export interface MongoTableDataQuery {
     name?: { $regex: string; $options: string };
     status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
     user?: string;
-    updatedTime?: {
+    /*date?: {
         $gte?: Date;
         $lte?: Date;
-    };
+    };*/
 }
