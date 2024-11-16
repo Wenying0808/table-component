@@ -7,6 +7,7 @@ export type BaseAnalysis = {
     updatedTime: string;
     duration: number | "";
     user?: string;
+    isArchived?: boolean;
 }
 
 // Table 2 - level 2: app

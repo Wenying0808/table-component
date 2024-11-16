@@ -8,6 +8,7 @@ interface ITable1 extends Document {
     updatedTime: string;
     duration: number; // mins
     user: string;
+    isArchived?: boolean;
 }
 // schema
 const table1Schema: Schema<ITable1> = new Schema({  
@@ -34,6 +35,10 @@ const table1Schema: Schema<ITable1> = new Schema({
     user: {
         type: String,
         required: true,
+    },
+    isArchived: {
+        type: Boolean,
+        required: false,
     },
 });
 
