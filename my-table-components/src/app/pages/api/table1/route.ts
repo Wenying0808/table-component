@@ -35,6 +35,12 @@ export async function GET(request: Request) {
             query.date = { $gte: new Date(dateQuery), $lte: new Date(dateQuery) };
         }*/
 
+        // isArchived filter
+        const isArchivedFilter = searchParams.get('isArchived');
+        if (isArchivedFilter) {
+            query.isArchived = isArchivedFilter === 'true';
+        }
+
         console.log("table1query:", query);
         const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);

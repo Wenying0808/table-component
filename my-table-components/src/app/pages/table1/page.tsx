@@ -4,10 +4,9 @@
 import { useEffect, useMemo, useState } from "react";
 
 // External UI libraries
-import { IconButton, Input, SelectChangeEvent, Tooltip } from "@mui/material";
+import { SelectChangeEvent } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ClearIcon from '@mui/icons-material/Clear';
 import ScatterPlotOutlinedIcon from '@mui/icons-material/ScatterPlotOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 
@@ -20,6 +19,7 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 import Navbar from "@/app/components/navbar/navbar";
 import Loader from "@/app/components/loader";
 import { DataFilter, StatusFilterOptions, MenuItemOption } from "@/app/components/DataFilter";
+import ArchiveFilter from "@/app/components/ArchiveFilter";
 
 //Table Copmonents
 import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
@@ -34,7 +34,6 @@ import { Table1Row } from "@/app/components/table/Table1Row";
 // Utilities and types
 import { colors } from "@/app/styles/colors";
 import { spacing } from "@/app/styles/spacing";
-import { fonts } from "@/app/styles/fonts";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
 import Search from "@/app/components/Search";
@@ -49,6 +48,7 @@ export default function Table1Page() {
     const [nameFilter, setNameFilter] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
     const [userFilter, setUserFilter] = useState<string>('All');
+    const [isArchivedFilter, setIsArchivedFilter] = useState<boolean>(false);
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'updatedTime', desc: true }
     ]);
@@ -240,7 +240,8 @@ export default function Table1Page() {
     const handleFetchData = async (filters: FilterParams = {
         name: nameFilter, 
         status: statusFilter,
-        user: userFilter
+        user: userFilter,
+        isArchived: isArchivedFilter
     }) => {
         try{
             setIsDataLoading(true);
@@ -252,9 +253,13 @@ export default function Table1Page() {
             if (filters.status) {
                 params.append('status', filters.status);
             }
-            if(filters.user) {
+            if (filters.user) {
                 params.append('user', filters.user);
             }
+            if (filters.isArchived !== undefined) {
+                params.append('isArchived', filters.isArchived.toString());
+            }
+            
             const queryString = params.toString();
             const response = await fetch(`/pages/api/table1?${queryString}`);
             const table1 = await response.json();
@@ -303,7 +308,7 @@ export default function Table1Page() {
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
             setNameFilter(searchValue);
-            await handleFetchData({ name: searchValue, status: statusFilter, user: userFilter});
+            await handleFetchData({ name: searchValue, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error searching by name:', error);
         }
@@ -313,7 +318,7 @@ export default function Table1Page() {
     const handleClearSearch = async () => {
         try{
             setNameFilter('');
-            const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter});
+            const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
             setData(data);
         } catch (error) {
             console.error('Error clearing search:', error);
@@ -322,12 +327,17 @@ export default function Table1Page() {
 
     const handleStatusFilterChange = async (e: SelectChangeEvent<string>) => {
         setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
-        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter});
+        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter, isArchived: isArchivedFilter});
     }
 
     const handleUserFilterChange = async (e: SelectChangeEvent<string>) => {
         setUserFilter(e.target.value);
-        await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value});
+        await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value, isArchived: isArchivedFilter});
+    }
+
+    const handleArchiveFilterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        setIsArchivedFilter(e.target.checked);
+        await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
     }
 
     useEffect(() => {
@@ -358,9 +368,13 @@ export default function Table1Page() {
                     <DataFilter 
                         id="user-filter"
                         value={userFilter}
-                        icon={<PersonOutlineIcon/>}
+                        icon={<PersonOutlineIcon />}
                         options={userFilterOptions}
                         onChange={handleUserFilterChange}
+                    />
+                    <ArchiveFilter 
+                        isArchived={isArchivedFilter}
+                        onChange={handleArchiveFilterChange}
                     />
                     <LoadingButton size="medium"
                         onClick={handleAddData}

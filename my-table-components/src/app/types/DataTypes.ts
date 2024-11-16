@@ -35,6 +35,7 @@ export interface FilterParams {
     status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
     user?: string;
     date?: string;
+    isArchived?: boolean;
 }
 
 // used for MongoDB queries in the API
@@ -46,4 +47,5 @@ export interface MongoTableDataQuery {
         $gte?: Date;
         $lte?: Date;
     };*/
+    isArchived?: boolean;
 }
