@@ -82,7 +82,7 @@ export default function Table1Page() {
         }
     })
 
-    // column definitions
+    // column definitions for add column dropdown menu options
     const availableColumns = useMemo(() => {
         if (data.length === 0) return [];
         // get the keys of the first object in the array and filter out the ones which columnVisibility is false
@@ -91,7 +91,8 @@ export default function Table1Page() {
                 value: key,
                 label: key.charAt(0).toUpperCase() + key.slice(1)
             }))
-            .filter(column => column.value !== "_id" &&!columnVisibility[column.value as keyof typeof columnVisibility])
+            // exclude the columns that are the id or isArchived and the ones that are visible
+            .filter(column => column.value !== "_id" && column.value !== "isArchived" && !columnVisibility[column.value as keyof typeof columnVisibility])
             .sort((a, b) => a.value.localeCompare(b.label));
     }, [data, columnVisibility]);
 
@@ -344,13 +345,20 @@ export default function Table1Page() {
         handleFetchData();
     }, []);
 
+    const controlBarStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+        width: 'fit-content',
+        height: spacing.filter_component_height
+    }
 
     return (
         <div className="table-page">
             <Navbar />
             <main className="page-main">
                 <div className="table-control-bar" 
-                    style={{ display: 'flex', alignItems: 'center', gap: '20px', width: 'fit-content',height: spacing.filter_component_height}}
+                    style={controlBarStyle}
                 >
                     <Search 
                         value={nameFilter}

@@ -12,7 +12,7 @@ interface ArchiveFilterProps {
 const filterStyle = {
     display: 'flex',
     alignItems: 'center',
-    gap: '4px'
+    gap: '0px'
 }
 
 export default function ArchiveFilter({
