@@ -7,13 +7,14 @@ import { useState } from 'react';
 import { colors } from '../../../styles/colors';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Tooltip } from '@mui/material';
 
 export default function ColumnHeader({ id, children, isSortable = false, sortingState, columnIsRemoveable, handleSorting, handleRemoveColumn } : TableColumnHeaderProps ) {
     const [isHovered, setIsHovered] = useState(false);
     const getSortingIcon = (sortingDirection: SortingDirection) => {
         if (sortingDirection === 'asc') return <ArrowUpwardIcon onClick={handleSorting} style={{color: colors.azure, cursor: 'pointer'}} />;
         if (sortingDirection === 'desc') return <ArrowDownwardIcon onClick={handleSorting} style={{color: colors.azure, cursor: 'pointer'}} />;
-        if (sortingDirection === false && isHovered) return <ArrowUpwardIcon onClick={handleSorting}style={{color: colors.manatee, cursor: 'pointer'}} />;
+        if (sortingDirection === false && isHovered) return <Tooltip title="Sort Column" placement="top"><ArrowUpwardIcon onClick={handleSorting} style={{color: colors.manatee, cursor: 'pointer'}} /></Tooltip>;
         return null;
     };
     const {
@@ -25,25 +26,24 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
         isDragging,
       } = useSortable({
         id: id
-      });
+    });
 
-      const spanStyle = {
+    const spanStyle = {
         transform: CSS.Transform.toString(transform),
         transition,
         display: 'flex',
         alignItems: 'center',
         gap: '4px',
         opacity: isDragging ? 0.5 : 1,
-        
         backgroundColor: isDragging ? colors.alto : 'transparent',
         borderRight: `1px solid ${colors.gallery}`,
         paddingRight: '10px',
-      }
+    }
 
-      const dragIndicatorStyle = {
+    const dragIndicatorStyle = {
         color: colors.manatee,
         cursor: isDragging ? 'grabbing' : 'grab',
-      }
+    }
 
     return (
         <span 
@@ -65,13 +65,15 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
                 getSortingIcon(sortingState)
             }
             {columnIsRemoveable && isHovered && 
-                <CancelIcon 
-                    onClick={handleRemoveColumn} 
-                    style={{
-                        color: colors.manatee, 
-                        cursor: 'pointer'
-                    }} 
-                />
+                <Tooltip title="Remove Column" placement="top">
+                    <CancelIcon 
+                        onClick={handleRemoveColumn} 
+                        style={{
+                            color: colors.manatee, 
+                            cursor: 'pointer'
+                        }} 
+                    />
+                </Tooltip>
             }
             {isHovered && 
                 <DragIndicatorIcon 
