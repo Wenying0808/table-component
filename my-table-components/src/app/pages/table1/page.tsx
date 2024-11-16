@@ -37,6 +37,7 @@ import { spacing } from "@/app/styles/spacing";
 import { fonts } from "@/app/styles/fonts";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+import Search from "@/app/components/Search";
 
 
 export default function Table1Page() {
@@ -341,35 +342,12 @@ export default function Table1Page() {
                 <div className="table-control-bar" 
                     style={{ display: 'flex', alignItems: 'center', gap: '20px', width: 'fit-content',height: spacing.filter_component_height}}
                 >
-                    <div style={{
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '10px', 
-                        width: 'fit-content',
-                        padding: '4px 8px',
-                        backgroundColor: colors.white, 
-                        borderRadius: '4px', 
-                        border: `1px solid ${colors.manatee}`
-                    }}>
-                        <Input 
-                            placeholder="Search by name..." 
-                            value={nameFilter}
-                            onChange={handleNameSearch} 
-                            disableUnderline
-                            sx={{
-                                width: 'fit-content', 
-                                color: colors.black,
-                                fontSize: fonts.filter_component_font_size,
-                            }}
-                        />
-                        {nameFilter && 
-                            <Tooltip title="Clear Search" placement="top">
-                                <IconButton onClick={handleClearSearch} sx={{ width: "24px", height: "24px"}}>
-                                    <ClearIcon sx={{ fontSize: "14px"}}/>
-                                </IconButton>
-                            </Tooltip>
-                        }
-                    </div>
+                    <Search 
+                        value={nameFilter}
+                        placeholder="Search by name..."
+                        onChange={handleNameSearch}
+                        onClear={handleClearSearch}
+                    />
                     <DataFilter 
                         id="status-filter"
                         value={statusFilter}
