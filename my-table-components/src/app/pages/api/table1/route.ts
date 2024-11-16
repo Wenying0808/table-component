@@ -2,6 +2,7 @@ import connectToMongoDB from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import Table1Model from "@/app/models/Table1";
 import { MongoTableDataQuery } from "@/app/types/DataTypes";
+import { ObjectId } from "mongodb";
 
 export async function GET(request: Request) {
     try{
@@ -76,21 +77,39 @@ export async function POST(request: Request) {
     }
 }
 
-export async function PATCH() {
+export async function PATCH(request: Request) {
     try {
         await connectToMongoDB();
-        const result = await Table1Model.updateMany(
-            { isArchived: { $exists: false } },
-            { $set: { isArchived: false } }
+        const body = await request.json();
+        /*console.log("request patchbody:", body);*/
+        const { ids, action } = body;
+
+        if(!ids){
+            return NextResponse.json({ message: 'Table1: Invalid or missing ids' });
+        }
+        if(!action){
+            return NextResponse.json({ message: 'Table1: Invalid or missing action' });
+        }
+        //convert string ID to ObjectID
+        const objectIds = ids.map((id: string) => new ObjectId(id));
+        /*console.log("objectIds:", objectIds);*/
+
+        // archive unarchived documents or unarchive archived documents
+        const result = await Table1Model.collection.updateMany(
+            { _id: { $in: objectIds } },
+            { $set: { isArchived: action === 'archive' } }
         );
         
+        /*console.log("result:", result);*/
+
         return NextResponse.json({ 
-            success: true, 
-            message: `Updated ${result.modifiedCount} documents with isArchived field` 
+            message: `Table1: Successfully ${action}ed documents`,
+            modifiedCount: result.modifiedCount
         });
+       
     } catch (error) {
         return NextResponse.json(
-            { success: false, message: 'Failed to update documents', error },
+            { success: false, message: 'Table1: Failed to update documents', error },
             { status: 500 }
         );
     }

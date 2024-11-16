@@ -55,6 +55,8 @@ export default function Table1Page() {
         { id: 'updatedTime', desc: true }
     ]);
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
+    const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
+    const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
 
     const {
         columnVisibility,
@@ -85,6 +87,49 @@ export default function Table1Page() {
         }
     })
 
+    // styles
+    const controlBarStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: spacing.filter_component_height
+    }
+
+    const ControlbarLeftContainerStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+    }
+
+    const ControlbarRightContainerStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+    }
+
+    const primaryButtonStyle = {
+        color: colors.white,
+        backgroundColor: colors.azure,
+        '&:hover': {
+            backgroundColor: colors.azure,
+        }
+    }
+
+    const secondaryButtonStyle = {
+        color: colors.azure,
+    }
+
+    const checkboxStyle = {
+        color: colors.azure,
+        '&.Mui-checked': {
+            color: colors.azure,
+        },
+        '&.Mui-indeterminate': {
+            color: colors.azure,
+        }
+    }
+
+
     // column definitions for add column dropdown menu options
     const availableColumns = useMemo(() => {
         if (data.length === 0) return [];
@@ -111,13 +156,15 @@ export default function Table1Page() {
     }
     const handleSelectAllRows = useCallback(() => {
         if (data.length > 0 && selectedRows.length === data.length) {
-            console.log('Unselecting all rows');
+            /*console.log('Unselecting all rows');*/
             setSelectedRows([]);
         } else {
-            console.log('Selecting all rows');
+            /*console.log('Selecting all rows');*/
             setSelectedRows(data.map(row => row._id!));
         }
     }, [data, selectedRows]);
+
+    console.log('selectedRows:', selectedRows);
 
     const columns = useMemo(() => [
         columnHelper.display({
@@ -127,12 +174,14 @@ export default function Table1Page() {
                     checked={data.length > 0 && selectedRows.length === data.length}
                     indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
                     onChange={handleSelectAllRows}
+                    sx={checkboxStyle}
                 />
             ),
             cell: ({ row }) => (
                 <Checkbox
                     checked={selectedRows.includes(row.original._id!)}
                     onChange={() => handleRowSelection(row.original._id!)}
+                    sx={checkboxStyle}
                 />
             ),
         }),
@@ -325,6 +374,7 @@ export default function Table1Page() {
                 "status": randomStatus,
                 "user": randomUser,
                 "actions": ['Report'],
+                "isArchived": false,
             };
             const response = await fetch('/pages/api/table1', {
                 method: 'POST',
@@ -377,7 +427,53 @@ export default function Table1Page() {
 
     const handleArchiveFilterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsArchivedFilter(e.target.checked);
+        setSelectedRows([]);
         await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
+    }
+
+    const handleArchiveSelectedRows = async () => {
+        try{
+            setIsArchivingData(true);
+            const requestBody = {
+                ids: selectedRows,
+                action: "archive"
+            }
+            const response = await fetch(`/pages/api/table1`, {
+                method: 'PATCH',
+                body: JSON.stringify(requestBody)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to archive selected rows');
+            }
+            await handleFetchData();
+        } catch (error) {
+            console.error('Error archiving selected rows:', error);
+        } finally {
+            setIsArchivingData(false);
+            setSelectedRows([]);
+        }
+    }
+    const handleUnarchiveSelectedRows = async () => {
+        try{
+            setIsUnarchivingData(true);
+            const requestBody = {
+                ids: selectedRows,
+                action: "unarchive"
+            }
+            const response = await fetch(`/pages/api/table1`, {
+                method: 'PATCH',
+                body: JSON.stringify(requestBody)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to archive selected rows');
+            }
+            await handleFetchData();
+        } catch (error) {
+            console.error('Error unarchiving selected rows:', error);
+        } finally {
+            setIsUnarchivingData(false);
+            setSelectedRows([]);
+        }
     }
 
  
@@ -386,74 +482,71 @@ export default function Table1Page() {
         handleFetchData();
     }, []);
 
-    // styles
-    const controlBarStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-        width: 'fit-content',
-        height: spacing.filter_component_height
-    }
-
-    const primaryButtonStyle = {
-        color: colors.white,
-        backgroundColor: colors.azure,
-        '&:hover': {
-            backgroundColor: colors.azure,
-        }
-    }
-
-    const secondaryButtonStyle = {
-        color: colors.azure,
-    }
 
     return (
         <div className="table-page">
             <Navbar />
             <main className="page-main">
-                <div className="table-control-bar" 
-                    style={controlBarStyle}
-                >
-                    <Search 
-                        value={nameFilter}
-                        placeholder="Search by name..."
-                        onChange={handleNameSearch}
-                        onClear={handleClearSearch}
-                    />
-                    <DataFilter 
-                        id="status-filter"
-                        value={statusFilter}
-                        icon={<ScatterPlotOutlinedIcon/>}
-                        options={StatusFilterOptions}
-                        onChange={handleStatusFilterChange}
-                    />
-                    <DataFilter 
-                        id="user-filter"
-                        value={userFilter}
-                        icon={<PersonOutlineIcon />}
-                        options={userFilterOptions}
-                        onChange={handleUserFilterChange}
-                    />
-                    <ArchiveFilter 
-                        isArchived={isArchivedFilter}
-                        onChange={handleArchiveFilterChange}
-                    />
-                    <LoadingButton size="medium"
-                        onClick={handleAddData}
-                        endIcon={<AddCircleIcon />}
-                        loading={isAddingData}
-                        loadingPosition="end"
-                        variant="contained"
-                        sx={primaryButtonStyle}
-                    >
-                        Add Data
-                    </LoadingButton>
-                    { selectedRows.length > 0 
-                        ? isArchivedFilter
-                            ? <LoadingButton sx={secondaryButtonStyle}>Unarchive</LoadingButton>
-                            : <LoadingButton sx={secondaryButtonStyle}>Archive</LoadingButton>
-                        : null
-                    }
+                <div className="table-control-bar" style={controlBarStyle}>
+                    <div style={ControlbarLeftContainerStyle}>
+                        <Search 
+                                value={nameFilter}
+                            placeholder="Search by name..."
+                            onChange={handleNameSearch}
+                            onClear={handleClearSearch}
+                        />
+                        <DataFilter 
+                            id="status-filter"
+                            value={statusFilter}
+                            icon={<ScatterPlotOutlinedIcon/>}
+                            options={StatusFilterOptions}
+                            onChange={handleStatusFilterChange}
+                        />
+                        <DataFilter 
+                            id="user-filter"
+                            value={userFilter}
+                            icon={<PersonOutlineIcon />}
+                            options={userFilterOptions}
+                            onChange={handleUserFilterChange}
+                        />
+                        <ArchiveFilter 
+                            isArchived={isArchivedFilter}
+                            onChange={handleArchiveFilterChange}
+                        />
+                    </div>     
+                    <div style={ControlbarRightContainerStyle}>
+                        { selectedRows.length > 0 
+                            ? isArchivedFilter
+                                ? <LoadingButton 
+                                    onClick={handleUnarchiveSelectedRows} 
+                                    sx={secondaryButtonStyle} 
+                                    loading={isUnarchivingData} 
+                                    loadingPosition="start">
+                                        Unarchive
+                                    </LoadingButton>
+                                : <LoadingButton 
+                                    onClick={handleArchiveSelectedRows} 
+                                    sx={secondaryButtonStyle} 
+                                    loading={isArchivingData} 
+                                    loadingPosition="start">
+                                        Archive
+                                    </LoadingButton>
+                            : null
+                        }
+                        <LoadingButton size="medium"
+                            onClick={handleAddData}
+                            endIcon={<AddCircleIcon />}
+                            loading={isAddingData}
+                            loadingPosition="end"
+                            variant="contained"
+                            sx={primaryButtonStyle}
+                        >
+                            Add Data
+                        </LoadingButton>
+                        <div>
+                            {selectedRows.length} of {data.length} selected
+                        </div>
+                    </div>
                 </div>
                 {isDataLoading ? 
                     <Loader /> : 
