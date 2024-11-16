@@ -1,10 +1,10 @@
 "use client";
 
 // React and core dependencies
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 // External UI libraries
-import { SelectChangeEvent } from "@mui/material";
+import { Checkbox, SelectChangeEvent } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ScatterPlotOutlinedIcon from '@mui/icons-material/ScatterPlotOutlined';
@@ -42,7 +42,9 @@ import Search from "@/app/components/Search";
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
-    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>([{label: "All", value: "All"}]);
+    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>(
+        [{label: "All", value: "All"}]
+    );
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [nameFilter, setNameFilter] = useState<string>('');
@@ -52,6 +54,7 @@ export default function Table1Page() {
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'updatedTime', desc: true }
     ]);
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
     const {
         columnVisibility,
@@ -69,9 +72,9 @@ export default function Table1Page() {
         sensors,
         handleDragEnd,
     } = TableColumnsManagement({
-        initialColumnOrder: ['id', 'name', 'status', 'actions', 'add'],
+        initialColumnOrder: ['select', 'name', 'status', 'actions', 'add'],
         initialColumnVisibility: {
-            'id': true,
+            'select': true,
             'name': true,
             'user': false,
             'status': true,
@@ -96,7 +99,43 @@ export default function Table1Page() {
             .sort((a, b) => a.value.localeCompare(b.label));
     }, [data, columnVisibility]);
 
+
+    // Selection Functions
+
+    const handleRowSelection = (rowId: string) => {
+        setSelectedRows(prev => 
+            prev.includes(rowId)
+                ? prev.filter(id => id !== rowId)
+                : [...prev, rowId]
+        );
+    }
+    const handleSelectAllRows = useCallback(() => {
+        if (data.length > 0 && selectedRows.length === data.length) {
+            console.log('Unselecting all rows');
+            setSelectedRows([]);
+        } else {
+            console.log('Selecting all rows');
+            setSelectedRows(data.map(row => row._id!));
+        }
+    }, [data, selectedRows]);
+
     const columns = useMemo(() => [
+        columnHelper.display({
+            id: 'select',
+            header: () => (
+                <Checkbox
+                    checked={data.length > 0 && selectedRows.length === data.length}
+                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
+                    onChange={handleSelectAllRows}
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={selectedRows.includes(row.original._id!)}
+                    onChange={() => handleRowSelection(row.original._id!)}
+                />
+            ),
+        }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
             header: ({ column }) => (
@@ -219,7 +258,7 @@ export default function Table1Page() {
             ),
             enableHiding: false,
         })
-    ], []);
+    ], [selectedRows, data, handleSelectAllRows]);
 
     // table definition
     const table = useReactTable({ 
@@ -302,7 +341,7 @@ export default function Table1Page() {
         }
     }
 
-    // Search Functions
+    // Filter Functions
 
     const handleNameSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try{
@@ -341,16 +380,31 @@ export default function Table1Page() {
         await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
     }
 
+ 
+
     useEffect(() => {
         handleFetchData();
     }, []);
 
+    // styles
     const controlBarStyle = {
         display: 'flex',
         alignItems: 'center',
         gap: '20px',
         width: 'fit-content',
         height: spacing.filter_component_height
+    }
+
+    const primaryButtonStyle = {
+        color: colors.white,
+        backgroundColor: colors.azure,
+        '&:hover': {
+            backgroundColor: colors.azure,
+        }
+    }
+
+    const secondaryButtonStyle = {
+        color: colors.azure,
     }
 
     return (
@@ -390,16 +444,16 @@ export default function Table1Page() {
                         loading={isAddingData}
                         loadingPosition="end"
                         variant="contained"
-                        sx={{
-                            color: colors.white,
-                            backgroundColor: colors.azure,
-                            '&:hover': {
-                                backgroundColor: colors.azure,
-                            }
-                        }}
+                        sx={primaryButtonStyle}
                     >
                         Add Data
                     </LoadingButton>
+                    { selectedRows.length > 0 
+                        ? isArchivedFilter
+                            ? <LoadingButton sx={secondaryButtonStyle}>Unarchive</LoadingButton>
+                            : <LoadingButton sx={secondaryButtonStyle}>Archive</LoadingButton>
+                        : null
+                    }
                 </div>
                 {isDataLoading ? 
                     <Loader /> : 
