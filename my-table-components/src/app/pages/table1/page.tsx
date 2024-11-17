@@ -539,9 +539,7 @@ export default function Table1Page() {
                                             return (
                                                 <Table1Row 
                                                     key={row.id} 
-                                                    style={{
-                                                        height: `${virtualRow.size}px`,
-                                                    }}
+                                                    height={`${virtualRow.size}px`}
                                                 >
                                                     {row.getVisibleCells().map(cell => (
                                                         <td key={cell.id}>
