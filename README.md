@@ -26,6 +26,8 @@
 - Reorder columns
 - Add/remove columns
 - Expand/collapse rows
+- Select rows
+- Virtualization
 
 ## Stack
 
@@ -33,5 +35,6 @@
 - Typescript
 - Next.js
 - MUI
-- Tanstack Table
+- ![Tanstack Table](https://tanstack.com/table/latest)
+- ![React Virtual](https://tanstack.com/virtual/latest)
 - MongoDB
