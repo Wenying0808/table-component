@@ -1,7 +1,7 @@
 "use client";
 
 // React and core dependencies
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 
 // External UI libraries
 import { Checkbox, SelectChangeEvent } from "@mui/material";
@@ -32,6 +32,9 @@ import { Table1Row } from "@/app/components/table/Table1Row";
 import { colors } from "@/app/styles/colors";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+
+// Virtulization
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 
  // styles
@@ -290,6 +293,27 @@ export default function Table1Page() {
         onColumnVisibilityChange: setColumnVisibility,
     });
 
+    // Virtualization
+    const { rows } = table.getRowModel();
+    const tableContainerRef = useRef<HTMLDivElement>(null);
+    const virtualizer = useVirtualizer({
+        count: rows.length,
+        getScrollElement: () => tableContainerRef.current, // target the existing scrollable container
+        estimateSize: () => 42, // height of row
+        overscan: 10, // number of rows to render outside of the viewport
+    })
+
+    // Virtualized rows
+    const virtualRows = virtualizer.getVirtualItems();
+    const totalHeight = virtualizer.getTotalSize();
+    const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0;
+    const paddingBottom = virtualRows.length > 0
+        ? totalHeight - (virtualRows[virtualRows.length - 1].end || 0)
+        : 0;
+
+    console.log("virtualRows", virtualRows);
+
+
     // data fetching and handling
     const handleFetchData = useCallback(async (filters: FilterParams = {
         name: nameFilter, 
@@ -339,6 +363,7 @@ export default function Table1Page() {
                 "status": randomStatus,
                 "user": randomUser,
                 "actions": ['Report'],
+                "duration": 10,
                 "isArchived": false,
             };
             const response = await fetch('/pages/api/table1', {
@@ -486,40 +511,65 @@ export default function Table1Page() {
                         sensors={sensors}
                         onDragEnd={handleDragEnd}
                     >
-                        <table className="table1">
-                            <thead className="sticky-column-header">
-                            {table.getHeaderGroups().map(headerGroup => (
-                                <TableColumnHeaderRow key={headerGroup.id}>
-                                    <SortableContext
-                                        items={headerGroup.headers.map(header => header.id)}
-                                        strategy={horizontalListSortingStrategy}
-                                    >
-                                        {headerGroup.headers.map(header => (
-                                            <th key={header.id}>
-                                                {flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                            </th>
-                                        ))}
-                                    </SortableContext>
-                                </TableColumnHeaderRow>
-                            ))}
-                            </thead>
-                            <tbody>
-                                {table.getRowModel().rows.map(row => (
-                                    <Table1Row key={row.id}>
-                                        {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext())}
-                                            </td>
-                                        ))}
-                                    </Table1Row>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div ref={tableContainerRef} className="table1-container" style={{ height: '70vh', width: '80vw', overflow: 'auto' }}>
+                            <table className="table1">
+                                <thead className="sticky-column-header">
+                                    {table.getHeaderGroups().map(headerGroup => (
+                                        <TableColumnHeaderRow key={headerGroup.id}>
+                                            <SortableContext
+                                                items={headerGroup.headers.map(header => header.id)}
+                                                strategy={horizontalListSortingStrategy}
+                                            >
+                                                {headerGroup.headers.map(header => (
+                                                    <th key={header.id}>
+                                                        {flexRender(
+                                                            header.column.columnDef.header,
+                                                            header.getContext()
+                                                        )}
+                                                    </th>
+                                                ))}
+                                            </SortableContext>
+                                        </TableColumnHeaderRow>
+                                    ))}
+                                </thead>
+                                <tbody>
+                                    <tr style={{ height: `${paddingTop}px` }} />
+                                        {virtualRows.map(virtualRow => {
+                                            const row = rows[virtualRow.index];
+                                            return (
+                                                <Table1Row 
+                                                    key={row.id} 
+                                                    style={{
+                                                        height: `${virtualRow.size}px`,
+                                                    }}
+                                                >
+                                                    {row.getVisibleCells().map(cell => (
+                                                        <td key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext()
+                                                            )}
+                                                        </td>
+                                                    ))}
+                                                </Table1Row>
+                                            );
+                                        })}
+                                    <tr style={{ height: `${paddingBottom}px` }} />
+                                    {/*table.getRowModel().rows.map(row => (
+                                        <Table1Row key={row.id}>
+                                            {row.getVisibleCells().map(cell => (
+                                                <td key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext())}
+                                                </td>
+                                            ))}
+                                        </Table1Row>
+                                    ))}*/}
+                                </tbody>
+                            </table>
+                        </div>
+                        
                     </DndContext>
                 </>:
                     <PlaceholderNoResult />

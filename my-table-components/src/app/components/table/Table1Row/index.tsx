@@ -1,9 +1,12 @@
 import { colors } from '../../../styles/colors';
 import { useState } from 'react';
 
+interface Table1RowProps {
+    children: React.ReactNode;
+    style?: React.CSSProperties;
+}
 
-
-export const Table1Row = ({ children }: { children: React.ReactNode }) => {
+export const Table1Row = ({ children, style }: Table1RowProps) => {
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -17,7 +20,8 @@ export const Table1Row = ({ children }: { children: React.ReactNode }) => {
     
     return (
         <tr 
-            style={rowStyles}
+            
+            style={style}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
