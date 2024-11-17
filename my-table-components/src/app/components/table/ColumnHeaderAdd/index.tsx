@@ -7,7 +7,7 @@ export const ColumnHeaderAdd: React.FC<ColumnHeaderAddProps > = ({ onClick })  =
     return (
         <>
             <Tooltip title="Add column" placement="top">
-                <IconButton onClick={onClick} sx={{ color: colors.azure}}>
+                <IconButton onClick={onClick} sx={{ color: colors.azure, '&:hover': { backgroundColor: colors.linkWater }, cursor: 'pointer'}}>
                     <AddCircleOutlineIcon />
                 </IconButton>
             </Tooltip>

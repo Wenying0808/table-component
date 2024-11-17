@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { AppTaskAnalysis, TaskAnalysis, WorkflowTaskAnalysis } from "../../../types/DataTypes";
 import table3Data from "../../../data/MockData_Table3.json";
-import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, Row, SortingState, useReactTable } from "@tanstack/react-table";
 import { TableColumnHeaderRow } from "../TableColumnHeaderRow";
 import ColumnHeader from "../ColumnHeader";
 import { Table3Row } from "../Table3Row";
@@ -14,6 +14,7 @@ import { AddColumnModal } from "../AddColumnModal";
 import { DndContext } from '@dnd-kit/core';
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { ExpandableRow } from "@/app/types/TableTypes";
 
 export default function Table3() {
     const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();
@@ -64,7 +65,7 @@ export default function Table3() {
     const columns = useMemo(() => [
         columnHelper.display({
             id: 'expand',
-            cell: ({ row }) => <Table3CellExpand row={row} />,
+            cell: ({ row }) => <Table3CellExpand row={row as Row<ExpandableRow>} />,
             header: () => <span className="table-header"></span>,
             enableHiding: false,
         }),
@@ -272,7 +273,7 @@ export default function Table3() {
                     <tbody>
                         {table.getRowModel().rows.map(row => (
                             <React.Fragment key={row.id}>
-                                <Table3Row key={row.id} row={row}>
+                                <Table3Row key={row.id} row={row as Row<ExpandableRow>}>
                                     {row.getVisibleCells().map(cell => (
                                         <td key={cell.id}>
                                             {flexRender(

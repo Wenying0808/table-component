@@ -6,7 +6,7 @@ import { colors } from '../../../styles/colors';
 
 export const Table2CellExpand = <T extends ExpandableRow>({ row }: TableCellExpandProps<T>) => {
     const cellStyles = {
-        paddingLeft: "8px", 
+        paddingLeft: "8px",     
         height: row.depth === 0 ? "46px" : "34px", 
         borderLeft: row.depth === 0 ? `4px solid ${colors.azure}` : "none"
     };

@@ -1,17 +1,19 @@
 import { colors } from '../../../styles/colors';
 import { useState } from 'react';
 
+interface Table1RowProps {
+    children: React.ReactNode;
+    height?: string; //  from virtual rows
+}
 
-
-export const Table1Row = ({ children }: { children: React.ReactNode }) => {
+export const Table1Row = ({ children, height }: Table1RowProps) => {
 
     const [isHovered, setIsHovered] = useState(false);
 
     const rowStyles = {
         fontSize: "14px",
         fontWeight: 500,
-        borderBottom: `1px solid ${colors.alto}`,
-        height: "34px",
+        height: height || "42px",
         backgroundColor: isHovered ? `${colors.linkWater}` : "transparent",
     };
     

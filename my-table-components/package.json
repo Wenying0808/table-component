@@ -14,8 +14,10 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.4",
-    "@mui/material": "^6.1.4",
+    "@mui/lab": "^6.0.0-beta.15",
+    "@mui/material": "^6.1.7",
     "@tanstack/react-table": "^8.20.5",
+    "@tanstack/react-virtual": "^3.10.9",
     "mongodb": "^6.10.0",
     "mongoose": "^8.8.0",
     "next": "14.2.15",
@@ -29,6 +31,8 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5"
   }
 }

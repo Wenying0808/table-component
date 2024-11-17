@@ -78,7 +78,12 @@ a {
   height: fit-content;
 }
 
-.table1, .table2, .table3 {
+.table1 {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table2, .table3 {
   height: 70vh;
   overflow-y: auto;
   display: block; 

@@ -7,7 +7,7 @@
       "updatedTime": "2024-10-20T14:30:00Z",
       "duration": 150,
       "user": "John Doe",
-      "analyses": [
+      "appAnalyses": [
         {
           "id": "aa1",
           "name": "IGX-Profile",
@@ -120,7 +120,7 @@
       "updatedTime": "2024-10-21T09:00:00Z",
       "duration": 120,
       "user": "Oliver Smith",
-      "analyses": [
+      "appAnalyses": [
        {
           "id": "aa4",
           "name": "IGX-Profile",
@@ -199,7 +199,7 @@
       "updatedTime": "2024-10-25T09:00:00Z",
       "duration": 120,
       "user": "Oliver Smith",
-      "analyses": [
+      "appAnalyses": [
        {
           "id": "aa4",
           "name": "IGX-Profile",
