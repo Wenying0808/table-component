@@ -39,6 +39,49 @@ import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement
 import Search from "@/app/components/Search";
 
 
+ // styles
+ const controlBarStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: spacing.filter_component_height
+}
+
+const ControlbarLeftContainerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+}
+
+const ControlbarRightContainerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '20px',
+}
+
+const primaryButtonStyle = {
+    color: colors.white,
+    backgroundColor: colors.azure,
+    '&:hover': {
+        backgroundColor: colors.azure,
+    }
+}
+
+const secondaryButtonStyle = {
+    color: colors.azure,
+}
+
+const checkboxStyle = {
+    color: colors.azure,
+    '&.Mui-checked': {
+        color: colors.azure,
+    },
+    '&.Mui-indeterminate': {
+        color: colors.azure,
+    }
+}
+
+
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
@@ -87,48 +130,6 @@ export default function Table1Page() {
         }
     })
 
-    // styles
-    const controlBarStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: spacing.filter_component_height
-    }
-
-    const ControlbarLeftContainerStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-    }
-
-    const ControlbarRightContainerStyle = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px',
-    }
-
-    const primaryButtonStyle = {
-        color: colors.white,
-        backgroundColor: colors.azure,
-        '&:hover': {
-            backgroundColor: colors.azure,
-        }
-    }
-
-    const secondaryButtonStyle = {
-        color: colors.azure,
-    }
-
-    const checkboxStyle = {
-        color: colors.azure,
-        '&.Mui-checked': {
-            color: colors.azure,
-        },
-        '&.Mui-indeterminate': {
-            color: colors.azure,
-        }
-    }
-
 
     // column definitions for add column dropdown menu options
     const availableColumns = useMemo(() => {
@@ -164,7 +165,7 @@ export default function Table1Page() {
         }
     }, [data, selectedRows]);
 
-    console.log('selectedRows:', selectedRows);
+    /*console.log('selectedRows:', selectedRows);*/
 
     const columns = useMemo(() => [
         columnHelper.display({
@@ -307,7 +308,7 @@ export default function Table1Page() {
             ),
             enableHiding: false,
         })
-    ], [selectedRows, data, handleSelectAllRows]);
+    ], [selectedRows, data, handleSelectAllRows, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
     // table definition
     const table = useReactTable({ 
@@ -326,7 +327,7 @@ export default function Table1Page() {
     });
 
     // data fetching and handling
-    const handleFetchData = async (filters: FilterParams = {
+    const handleFetchData = useCallback(async (filters: FilterParams = {
         name: nameFilter, 
         status: statusFilter,
         user: userFilter,
@@ -360,9 +361,9 @@ export default function Table1Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }
+    }, [nameFilter, statusFilter, userFilter, isArchivedFilter]);
 
-    const handleAddData = async () => {
+    const handleAddData = useCallback(async () => {
         const statusOptions = ["Queued", "Running", "Completed", "Failed"];
         const userOptions = ["Paul Smith", "John Doe", "Jane Lin", "Alice Johnson", "Bob Brown"];
         const randomStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
@@ -389,11 +390,11 @@ export default function Table1Page() {
         } finally {
             setIsAddingData(false);
         }
-    }
+    }, [handleFetchData]);
 
     // Filter Functions
 
-    const handleNameSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNameSearch = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         try{
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
@@ -402,10 +403,10 @@ export default function Table1Page() {
         } catch (error) {
             console.error('Error searching by name:', error);
         }
-    }
+    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
     /*console.log("search value:", searchValue);*/
 
-    const handleClearSearch = async () => {
+    const handleClearSearch = useCallback(async () => {
         try{
             setNameFilter('');
             const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
@@ -413,25 +414,25 @@ export default function Table1Page() {
         } catch (error) {
             console.error('Error clearing search:', error);
         }
-    }
+    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
 
-    const handleStatusFilterChange = async (e: SelectChangeEvent<string>) => {
+    const handleStatusFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
         setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
         await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter, isArchived: isArchivedFilter});
-    }
+    }, [handleFetchData, nameFilter, userFilter, isArchivedFilter]);
 
-    const handleUserFilterChange = async (e: SelectChangeEvent<string>) => {
+    const handleUserFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
         setUserFilter(e.target.value);
         await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value, isArchived: isArchivedFilter});
-    }
+    }, [handleFetchData, nameFilter, statusFilter, isArchivedFilter]);
 
-    const handleArchiveFilterChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleArchiveFilterChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsArchivedFilter(e.target.checked);
         setSelectedRows([]);
         await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
-    }
+    }, [handleFetchData, nameFilter, statusFilter, userFilter]);
 
-    const handleArchiveSelectedRows = async () => {
+    const handleArchiveSelectedRows = useCallback(async () => {
         try{
             setIsArchivingData(true);
             const requestBody = {
@@ -452,8 +453,9 @@ export default function Table1Page() {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }
-    const handleUnarchiveSelectedRows = async () => {
+    }, [handleFetchData, selectedRows]);
+
+    const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
             setIsUnarchivingData(true);
             const requestBody = {
@@ -474,13 +476,12 @@ export default function Table1Page() {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }
+    }, [handleFetchData, selectedRows]);
 
  
-
     useEffect(() => {
         handleFetchData();
-    }, []);
+    }, [handleFetchData]);
 
 
     return (
@@ -490,7 +491,7 @@ export default function Table1Page() {
                 <div className="table-control-bar" style={controlBarStyle}>
                     <div style={ControlbarLeftContainerStyle}>
                         <Search 
-                                value={nameFilter}
+                            value={nameFilter}
                             placeholder="Search by name..."
                             onChange={handleNameSearch}
                             onClear={handleClearSearch}
