@@ -5,10 +5,7 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 
 // External UI libraries
 import { Checkbox, SelectChangeEvent } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import ScatterPlotOutlinedIcon from '@mui/icons-material/ScatterPlotOutlined';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+
 
 // Table related external libraries
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
@@ -17,9 +14,9 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 
 // Internal components
 import Navbar from "@/app/components/navbar/navbar";
+import TableControlBar from "@/app/components/TableControlBar";
 import Loader from "@/app/components/loader";
-import { DataFilter, StatusFilterOptions, MenuItemOption } from "@/app/components/DataFilter";
-import ArchiveFilter from "@/app/components/ArchiveFilter";
+import { MenuItemOption } from "@/app/components/DataFilter";
 
 //Table Copmonents
 import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
@@ -33,44 +30,11 @@ import { Table1Row } from "@/app/components/table/Table1Row";
 
 // Utilities and types
 import { colors } from "@/app/styles/colors";
-import { spacing } from "@/app/styles/spacing";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
 import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
-import Search from "@/app/components/Search";
 
 
  // styles
- const controlBarStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: spacing.filter_component_height
-}
-
-const ControlbarLeftContainerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-}
-
-const ControlbarRightContainerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-}
-
-const primaryButtonStyle = {
-    color: colors.white,
-    backgroundColor: colors.azure,
-    '&:hover': {
-        backgroundColor: colors.azure,
-    }
-}
-
-const secondaryButtonStyle = {
-    color: colors.azure,
-}
-
 const checkboxStyle = {
     color: colors.azure,
     '&.Mui-checked': {
@@ -488,67 +452,26 @@ export default function Table1Page() {
         <div className="table-page">
             <Navbar />
             <main className="page-main">
-                <div className="table-control-bar" style={controlBarStyle}>
-                    <div style={ControlbarLeftContainerStyle}>
-                        <Search 
-                            value={nameFilter}
-                            placeholder="Search by name..."
-                            onChange={handleNameSearch}
-                            onClear={handleClearSearch}
-                        />
-                        <DataFilter 
-                            id="status-filter"
-                            value={statusFilter}
-                            icon={<ScatterPlotOutlinedIcon/>}
-                            options={StatusFilterOptions}
-                            onChange={handleStatusFilterChange}
-                        />
-                        <DataFilter 
-                            id="user-filter"
-                            value={userFilter}
-                            icon={<PersonOutlineIcon />}
-                            options={userFilterOptions}
-                            onChange={handleUserFilterChange}
-                        />
-                        <ArchiveFilter 
-                            isArchived={isArchivedFilter}
-                            onChange={handleArchiveFilterChange}
-                        />
-                    </div>     
-                    <div style={ControlbarRightContainerStyle}>
-                        { selectedRows.length > 0 
-                            ? isArchivedFilter
-                                ? <LoadingButton 
-                                    onClick={handleUnarchiveSelectedRows} 
-                                    sx={secondaryButtonStyle} 
-                                    loading={isUnarchivingData} 
-                                    loadingPosition="start">
-                                        Unarchive
-                                    </LoadingButton>
-                                : <LoadingButton 
-                                    onClick={handleArchiveSelectedRows} 
-                                    sx={secondaryButtonStyle} 
-                                    loading={isArchivingData} 
-                                    loadingPosition="start">
-                                        Archive
-                                    </LoadingButton>
-                            : null
-                        }
-                        <LoadingButton size="medium"
-                            onClick={handleAddData}
-                            endIcon={<AddCircleIcon />}
-                            loading={isAddingData}
-                            loadingPosition="end"
-                            variant="contained"
-                            sx={primaryButtonStyle}
-                        >
-                            Add Data
-                        </LoadingButton>
-                        <div>
-                            {selectedRows.length} of {data.length} selected
-                        </div>
-                    </div>
-                </div>
+                <TableControlBar 
+                    nameFilter={nameFilter}
+                    statusFilter={statusFilter}
+                    userFilter={userFilter}
+                    isArchivedFilter={isArchivedFilter}
+                    selectedRows={selectedRows}
+                    totalRows={data.length}
+                    isAddingData={isAddingData}
+                    isArchivingData={isArchivingData}
+                    isUnarchivingData={isUnarchivingData}
+                    userFilterOptions={userFilterOptions}
+                    onNameSearch={handleNameSearch}
+                    onClearNameSearch={handleClearSearch}
+                    onStatusFilterChange={handleStatusFilterChange}
+                    onUserFilterChange={handleUserFilterChange}
+                    onArchiveFilterChange={handleArchiveFilterChange}
+                    onAddData={handleAddData}
+                    onArchiveRows={handleArchiveSelectedRows}
+                    onUnarchiveRows={handleUnarchiveSelectedRows}
+                />
                 {isDataLoading ? 
                     <Loader /> : 
                     data.length > 0 ? 
