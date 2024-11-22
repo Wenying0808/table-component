@@ -27,26 +27,17 @@ import { ColumnHeaderAdd } from "@/app/components/table/ColumnHeaderAdd";
 import { AddColumnModal } from "@/app/components/table/AddColumnModal";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
 import { Table1Row } from "@/app/components/table/Table1Row";
+import { checkboxStyle } from "@/app/components/table/ColumnHeaderCheckbox/ColumnHeaderCheckbox";
 
 // Utilities and types
-import { colors } from "@/app/styles/colors";
 import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
-import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
+import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
 
 // Virtulization
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 
- // styles
-const checkboxStyle = {
-    color: colors.azure,
-    '&.Mui-checked': {
-        color: colors.azure,
-    },
-    '&.Mui-indeterminate': {
-        color: colors.azure,
-    }
-}
 
 
 export default function Table1Page() {
@@ -97,7 +88,6 @@ export default function Table1Page() {
         }
     })
 
-
     // column definitions for add column dropdown menu options
     const availableColumns = useMemo(() => {
         if (data.length === 0) return [];
@@ -111,7 +101,6 @@ export default function Table1Page() {
             .filter(column => column.value !== "_id" && column.value !== "isArchived" && !columnVisibility[column.value as keyof typeof columnVisibility])
             .sort((a, b) => a.value.localeCompare(b.label));
     }, [data, columnVisibility]);
-
 
     // Selection Functions
 
@@ -343,7 +332,7 @@ export default function Table1Page() {
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
             setData(table1);
-            return table1;
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -352,18 +341,14 @@ export default function Table1Page() {
     }, [nameFilter, statusFilter, userFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
-        const statusOptions = ["Queued", "Running", "Completed", "Failed"];
-        const userOptions = ["Paul Smith", "John Doe", "Jane Lin", "Alice Johnson", "Bob Brown"];
-        const randomStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
-        const randomUser = userOptions[Math.floor(Math.random() * userOptions.length)];
         try {
             setIsAddingData(true);
             const newData = {
                 "name": `New Analysis ${Math.floor(Math.random() * 100)}`,
                 "status": randomStatus,
                 "user": randomUser,
-                "actions": ['Report'],
-                "duration": 10,
+                "actions": statusProps.actions,
+                "duration": statusProps.duration,
                 "isArchived": false,
             };
             const response = await fetch('/pages/api/table1', {
@@ -373,13 +358,13 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to add data');
             }
-            await handleFetchData();
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error adding data:', error);
         } finally {
             setIsAddingData(false);
         }
-    }, [handleFetchData]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, isArchivedFilter]);
 
     // Filter Functions
 
@@ -395,7 +380,7 @@ export default function Table1Page() {
     }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
     /*console.log("search value:", searchValue);*/
 
-    const handleClearSearch = useCallback(async () => {
+    const handleClearNameSearch = useCallback(async () => {
         try{
             setNameFilter('');
             const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
@@ -435,14 +420,14 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to archive selected rows');
             }
-            await handleFetchData();
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error archiving selected rows:', error);
         } finally {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -489,7 +474,7 @@ export default function Table1Page() {
                     isUnarchivingData={isUnarchivingData}
                     userFilterOptions={userFilterOptions}
                     onNameSearch={handleNameSearch}
-                    onClearNameSearch={handleClearSearch}
+                    onClearNameSearch={handleClearNameSearch}
                     onStatusFilterChange={handleStatusFilterChange}
                     onUserFilterChange={handleUserFilterChange}
                     onArchiveFilterChange={handleArchiveFilterChange}

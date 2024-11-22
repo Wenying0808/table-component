@@ -1,5 +1,6 @@
 "use client";
 
+import { MenuItemOption } from "@/app/components/DataFilter";
 import Navbar from "@/app/components/navbar/navbar";
 import { TableCellActions } from "@/app/components/table/ActionsCell";
 import { AddColumnModal } from "@/app/components/table/AddColumnModal";
@@ -9,20 +10,39 @@ import { TableCellStatus } from "@/app/components/table/StatusCell";
 import { Table2CellExpand } from "@/app/components/table/Table2CellExpand";
 import { Table2Row } from "@/app/components/table/Table2Row";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
-import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
-import { WorkflowAnalysis } from "@/app/types/DataTypes";
+import TableControlBar from "@/app/components/TableControlBar";
+import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
+import { FilterParams, WorkflowAnalysis } from "@/app/types/DataTypes";
 import { ExpandableRow } from "@/app/types/TableTypes";
 import { DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { Checkbox, SelectChangeEvent } from "@mui/material";
 import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, Row, SortingState, useReactTable } from "@tanstack/react-table";
-import React from "react";
+import React, { useCallback } from "react";
 import { useEffect, useMemo, useState } from "react";
+import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
+import Loader from "@/app/components/loader";
+import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
+import { checkboxStyle } from "@/app/components/table/ColumnHeaderCheckbox/ColumnHeaderCheckbox";
+ 
 
 
 export default function Table2Page() {
     const columnHelper = createColumnHelper<WorkflowAnalysis>();
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<WorkflowAnalysis[]>([]);
+    const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+    const [isAddingData, setIsAddingData] = useState<boolean>(false);
+    const [nameFilter, setNameFilter] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
+    const [userFilter, setUserFilter] = useState<string>('All');
+    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>(
+        [{label: "All", value: "All"}]
+    );
+    const [isArchivedFilter, setIsArchivedFilter] = useState<boolean>(false);
     const [sorting, setSorting] = useState<SortingState>([ {id: 'updatedTime', desc: true} ]);
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
+    const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
+    const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
     
     const {
         columnOrder,
@@ -38,9 +58,10 @@ export default function Table2Page() {
         sensors,
         handleDragEnd,
     } = TableColumnsManagement({
-        initialColumnOrder: ['expand', 'name', 'status', 'actions', 'add'],
+        initialColumnOrder: ['expand', 'select','name', 'status', 'actions', 'add'],
         initialColumnVisibility: {
             'expand': true,
+            'select': true,
             '_id': false,
             'name': true,
             'status': true,
@@ -48,11 +69,12 @@ export default function Table2Page() {
             'user': false,
             'actions': true,
             'updatedTime': false,
+            'isArchived': false,
             'add': true,
         }
     })
 
-    // define columns
+    // define columns options
     const availableColumns = useMemo(() => {
         if (data.length === 0) return [];
         // get the keys of the first object in the array and filter out the ones which columnVisibility is false and the ones that are inside appAnalyses
@@ -61,11 +83,54 @@ export default function Table2Page() {
                 value: key,
                 label: key.charAt(0).toUpperCase() + key.slice(1)
             }))
-            .filter(column => column.value !== 'appAnalyses' && !columnVisibility[column.value as keyof typeof columnVisibility])
+            .filter(column => column.value !== "_id" && column.value !== "isArchived" && column.value !== 'appAnalyses' && !columnVisibility[column.value as keyof typeof columnVisibility])
             .sort((a, b) => a.value.localeCompare(b.label));
     }, [data, columnVisibility]);
 
+    // Selection Functions
+
+    const handleRowSelection = (rowId: string) => {
+        setSelectedRows(prev => 
+            prev.includes(rowId)
+                ? prev.filter(id => id !== rowId)
+                : [...prev, rowId]
+        );
+    }
+    const handleSelectAllRows = useCallback(() => {
+        if (data.length > 0 && selectedRows.length === data.length) {
+            /*console.log('Unselecting all rows');*/
+            setSelectedRows([]);
+        } else {
+            /*console.log('Selecting all rows');*/
+            setSelectedRows(data
+                .map(row => row._id!)
+            );
+        }
+    }, [data, selectedRows]);
+
+    /*console.log('selectedRows:', selectedRows);*/
+
     const columns = useMemo(() => [
+        columnHelper.display({
+            id: 'select',
+            header: () => (
+                <Checkbox
+                    checked={data.length > 0 && selectedRows.length === data.length}
+                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
+                    onChange={handleSelectAllRows}
+                    sx={checkboxStyle}
+                />
+            ),
+            cell: ({ row }) => (
+                row.depth === 0 ? (
+                    <Checkbox
+                        checked={selectedRows.includes(row.original._id!)}
+                        onChange={() => handleRowSelection(row.original._id!)}
+                        sx={checkboxStyle}
+                    />
+                ) : null
+            ),
+        }),
         columnHelper.display({
             id: 'expand',
             cell: ({ row }) => <Table2CellExpand row={row as Row<ExpandableRow>} />,
@@ -207,7 +272,7 @@ export default function Table2Page() {
             ),
             enableHiding: false,
         })
-    ], []);
+    ], [selectedRows, data, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen, handleSelectAllRows]);
 
     // define table
     const table = useReactTable({ 
@@ -234,68 +299,252 @@ export default function Table2Page() {
     });
 
     // fetch data
-    const handleFetchData = async () => {
-        const response = await fetch('/pages/api/table2');
-        const data = await response.json();
-        setData(data);
-    }
+    const handleFetchData = useCallback(async (filters: FilterParams = {
+        name: nameFilter,
+        status: statusFilter,
+        user: userFilter,
+        isArchived: isArchivedFilter,
+    }) => {
+        try{
+            setIsDataLoading(true);
+
+            const params = new URLSearchParams();
+            if (filters.name) {
+                params.append('name', filters.name);
+            }
+            if (filters.status) {
+                params.append('status', filters.status);
+            }
+            if (filters.user) {
+                params.append('user', filters.user);
+            }
+            if (filters.isArchived !== undefined) {
+                params.append('isArchived', filters.isArchived.toString());
+            } 
+            const queryString = params.toString();
+            const response = await fetch(`/pages/api/table2?${queryString}`);
+            const table2Data = await response.json();
+            setData(table2Data);
+
+        } catch (error) {
+            console.error('Failed to fetch table2 data:', error);
+        } finally {
+            setIsDataLoading(false);
+        }
+    }, [nameFilter, statusFilter, userFilter, isArchivedFilter]);
+
+    const handleAddData = useCallback(async () => {
+        try{
+            setIsAddingData(true);
+            const createNewAnalysis = () => {
+                return {
+                    "name": `App analysis ${Math.floor(Math.random() * 100)}`,
+                    "status": randomStatus,
+                    "actions": statusProps.actions,
+                    "duration": statusProps.duration,
+                };
+            };
+            const newData = {
+                "name": `Workflow ${Math.floor(Math.random() * 100)}`,
+                "status": randomStatus,
+                "user": randomUser,
+                "actions": statusProps.actions,
+                "duration": statusProps.duration,
+                "isArchived": false,
+                "appAnalyses": [createNewAnalysis(), createNewAnalysis(), createNewAnalysis()],
+            };
+
+            console.log("newData:", newData);
+
+            const response = await fetch(`/pages/api/table2`, {
+                method: 'POST',
+                body: JSON.stringify(newData)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to add data to table2');
+            }
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+        } catch (error) {
+            console.error('Failed to add data:', error);
+        } finally {
+            setIsAddingData(false);
+        }
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+
+    const handleNameSearch = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            setNameFilter(e.target.value);
+            await handleFetchData({name: e.target.value, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+        } catch (error) {
+            console.error('Failed to search table2 data by name:', error);
+        }
+    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+
+    const handleClearNameSearch = useCallback(async () => {
+        try{
+            setNameFilter('');
+            await handleFetchData({name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+        } catch (error) {
+            console.error('Failed to clear search:', error);
+        }
+    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+
+    const handleStatusFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
+        try {
+            setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
+            await handleFetchData({name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter, isArchived: isArchivedFilter});
+        } catch (error) {
+            console.error('Failed to filter table2 data by status:', error);
+        }
+    }, [handleFetchData, nameFilter, userFilter, isArchivedFilter]);
+
+    const handleUserFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
+        try { 
+            setUserFilter(e.target.value);
+            await handleFetchData({name: nameFilter, status: statusFilter, user: e.target.value, isArchived: isArchivedFilter});
+        } catch (error) {
+            console.error('Failed to filter table2 data by user:', error);
+        }
+    }, [handleFetchData, nameFilter, statusFilter, isArchivedFilter]);
+
+    const handleArchiveFilterChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+        try{
+            setIsArchivedFilter(e.target.checked);
+            setSelectedRows([]);
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
+        } catch (error) {
+            console.error('Failed to filter table2 data by archive:', error);
+        }
+    }, [handleFetchData, nameFilter, statusFilter, userFilter]);
+
+    const handleArchiveSelectedRows = useCallback(async () => {
+        try {
+            setIsArchivingData(true);
+            const requestBody = {
+                ids: selectedRows,
+                action: "archive"
+            }
+            const response = await fetch(`/pages/api/table2`, {
+                method: 'PATCH',
+                body: JSON.stringify(requestBody)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to archive selected rows');
+            }
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+        } catch(error){
+            console.error('Failed to archive selected rows:', error);
+        } finally {
+            setIsArchivingData(false);
+            setSelectedRows([]);
+        }
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+
+    const handleUnarchiveSelectedRows = useCallback(async () => {
+        try{
+            setIsUnarchivingData(true);
+            const requestBody = {
+                ids: selectedRows,
+                action: "unarchive"
+            }
+            const response = await fetch(`/pages/api/table2`, {
+                method: 'PATCH',
+                body: JSON.stringify(requestBody)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to unarchive selected rows');
+            }
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+        } catch(error){
+            console.error('Failed to unarchive selected rows:', error);
+        } finally {
+            setIsUnarchivingData(false);
+            setSelectedRows([]);
+        }
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+
     
     useEffect(() => {
         handleFetchData();
-    }, []);
+    }, [handleFetchData]);
 
-    console.log("table2Data:", data);
+    /*console.log("table2Data:", data);*/
 
     return (
         <div className="table-page">
             <Navbar />
             <main className="page-main">
-            <>
-            <AddColumnModal 
-                open={isAddColumnModalOpen} 
-                onClose={() => setIsAddColumnModalOpen(false)} 
-                columnOptions={availableColumns}
-                onAddColumns={handleAddColumns}
-            />
-            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-                <table className="table2">
-                    <thead className="sticky-column-header">
-                        {table.getHeaderGroups().map(headerGroup => (
-                            <TableColumnHeaderRow key={headerGroup.id}>
-                                <SortableContext
-                                    items={headerGroup.headers.map(header => header.id)}
-                                    strategy={horizontalListSortingStrategy}
-                                >
-                                    {headerGroup.headers.map(header => (
-                                        <th key={header.id}>
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext()
-                                            )}
-                                        </th>
-                                    ))}
-                                </SortableContext>
-                            </TableColumnHeaderRow>
-                        ))}
-                    </thead>
-                    <tbody>
-                        {table.getRowModel().rows.map(row => (
-                            <React.Fragment key={row.id}>
-                                <Table2Row key={row.id} row={row as Row<ExpandableRow>}>
-                                    {row.getVisibleCells().map(cell => (
-                                        <td key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext())}
-                                        </td>
-                                    ))}
-                                </Table2Row>
-                            </React.Fragment> 
-                        ))}
-                    </tbody>
-                </table>
-            </DndContext>
-        </>
+                <TableControlBar 
+                    nameFilter={nameFilter}
+                    statusFilter={statusFilter}
+                    userFilter={userFilter}
+                    isArchivedFilter={isArchivedFilter}
+                    selectedRows={selectedRows}
+                    totalRows={data.length}
+                    isAddingData={isAddingData}
+                    isArchivingData={isArchivingData}
+                    isUnarchivingData={isUnarchivingData}
+                    userFilterOptions={userFilterOptions}
+                    onNameSearch={handleNameSearch}
+                    onClearNameSearch={handleClearNameSearch}
+                    onStatusFilterChange={handleStatusFilterChange}
+                    onUserFilterChange={handleUserFilterChange}
+                    onArchiveFilterChange={handleArchiveFilterChange}
+                    onAddData={handleAddData}
+                    onArchiveRows={handleArchiveSelectedRows}
+                    onUnarchiveRows={handleUnarchiveSelectedRows}
+                />
+                {isDataLoading 
+                    ? <Loader /> 
+                    : data.length > 0 ? 
+                    <>
+                        <AddColumnModal 
+                        open={isAddColumnModalOpen} 
+                        onClose={() => setIsAddColumnModalOpen(false)} 
+                        columnOptions={availableColumns}
+                            onAddColumns={handleAddColumns}
+                        />
+                        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                            <table className="table2">
+                            <thead className="sticky-column-header">
+                                {table.getHeaderGroups().map(headerGroup => (
+                                    <TableColumnHeaderRow key={headerGroup.id}>
+                                        <SortableContext
+                                            items={headerGroup.headers.map(header => header.id)}
+                                            strategy={horizontalListSortingStrategy}
+                                        >
+                                            {headerGroup.headers.map(header => (
+                                                <th key={header.id}>
+                                                    {flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                                </th>
+                                            ))}
+                                        </SortableContext>
+                                    </TableColumnHeaderRow>
+                                ))}
+                            </thead>
+                            <tbody>
+                                {table.getRowModel().rows.map(row => (
+                                    <React.Fragment key={row.id}>
+                                        <Table2Row key={row.id} row={row as Row<ExpandableRow>}>
+                                            {row.getVisibleCells().map(cell => (
+                                                <td key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext())}
+                                                </td>
+                                            ))}
+                                        </Table2Row>
+                                    </React.Fragment> 
+                                ))}
+                            </tbody>
+                        </table>
+                    </DndContext>
+                    </>
+                    : <PlaceholderNoResult />
+                }
             </main>
         </div>
     )

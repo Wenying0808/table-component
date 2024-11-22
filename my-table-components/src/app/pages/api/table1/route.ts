@@ -13,9 +13,9 @@ export async function GET(request: Request) {
         const query: MongoTableDataQuery = {};
 
         // name filter
-        const nameFilter = searchParams.get('name');
-        if (nameFilter) {
-            query.name = { $regex: nameFilter, $options: 'i'};
+        const nameQuery = searchParams.get('name');
+        if (nameQuery) {
+            query.name = { $regex: nameQuery, $options: 'i'};
         }
         
         // status filter
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
             query.isArchived = isArchivedFilter === 'true';
         }
 
-        console.log("table1query:", query);
+        console.log("table1 query:", query);
         const table1Data = await Table1Model.find(query);
         return NextResponse.json(table1Data);
     } catch (error) {

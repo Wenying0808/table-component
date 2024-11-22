@@ -9,7 +9,7 @@ import { TableCellStatus } from "@/app/components/table/StatusCell";
 import { Table3CellExpand } from "@/app/components/table/Table3CellExpand";
 import { Table3Row } from "@/app/components/table/Table3Row";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
-import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
 import { AppTaskAnalysis, TaskAnalysis, WorkflowTaskAnalysis } from "@/app/types/DataTypes";
 import { ExpandableRow } from "@/app/types/TableTypes";
 import { DndContext } from "@dnd-kit/core";
