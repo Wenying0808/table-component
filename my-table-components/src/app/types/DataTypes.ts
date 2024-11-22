@@ -30,22 +30,22 @@ export type WorkflowTaskAnalysis = BaseAnalysis & {
     appAnalyses?: AppTaskAnalysis[];
 }
 
+export type StatusFilter = 'All Status' | 'Queued' | 'Running' | 'Completed' | 'Failed';
+export type TimeRangeFilter = 'All Time' | 'Today' | 'This Week' | 'This Month';
+
 export interface FilterParams {
     name?: string;
-    status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
+    status?: StatusFilter;
     user?: string;
-    date?: string;
+    timeRange?: string;
     isArchived?: boolean;
 }
 
 // used for MongoDB queries in the API
 export interface MongoTableDataQuery {
     name?: { $regex: string; $options: string };
-    status?: 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed';
+    status?: StatusFilter;
     user?: string;
-    /*date?: {
-        $gte?: Date;
-        $lte?: Date;
-    };*/
+    timeRange?: TimeRangeFilter;
     isArchived?: boolean;
 }

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Table2Model from "@/app/models/Table2";
 import { MongoTableDataQuery } from "@/app/types/DataTypes";
 import { ObjectId } from "mongodb";
+import { startOfDay, startOfMonth, startOfWeek } from "date-fns";
 
 export async function GET(request: Request) {
     try{
@@ -20,14 +21,15 @@ export async function GET(request: Request) {
 
         // status filter
         const statusQuery = searchParams.get('status');
-        if (statusQuery && statusQuery !== 'All') {
+        if (statusQuery && statusQuery !== 'All Status') {
             query.status = statusQuery as 'Queued' | 'Running' | 'Completed' | 'Failed';
         }
 
         // user filter
         const userQuery = searchParams.get('user');
-        if (userQuery && userQuery !== 'All') {
-            query.user = userQuery;
+        if (userQuery && userQuery !== 'All Users') {
+            // my analyses, my name is "John Doe"
+            query.user = 'John Doe';
         }
 
         // isArchived filter
@@ -35,8 +37,40 @@ export async function GET(request: Request) {
         if (isArchivedQuery) {
             query.isArchived = isArchivedQuery === 'true';
         }
-        console.log("table2query:", query);
-        const table2Data = await Table2Model.find(query);
+
+        // date filter
+        const timeRangeQuery = searchParams.get('timeRange');
+        let timeRangeFilter={};
+        if (timeRangeQuery && timeRangeQuery !== 'All Time') {
+            const now = new Date();
+            switch (timeRangeQuery) {
+                case 'Today':
+                    timeRangeFilter = { 
+                        updatedTime: { 
+                            $gte: startOfDay(now).toISOString()
+                        } 
+                    };
+                    break;
+                case 'This Week':
+                    timeRangeFilter = {
+                        updatedTime: {
+                            $gte: startOfWeek(now).toISOString()
+                        }
+                    };
+                    break;
+                case 'This Month':
+                    timeRangeFilter = {
+                        updatedTime: {
+                            $gte: startOfMonth(now).toISOString()
+                        }
+                    };
+                    break;
+            }
+        }
+        const combinedQuery = { ...query, ...timeRangeFilter };        
+        
+        console.log("table2query:", combinedQuery);
+        const table2Data = await Table2Model.find(combinedQuery);
         return NextResponse.json(table2Data);
     } catch (error) {
         return NextResponse.json({ message: 'Table2:  Failed to fetch table data', error })

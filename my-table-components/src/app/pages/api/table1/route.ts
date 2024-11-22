@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import Table1Model from "@/app/models/Table1";
 import { MongoTableDataQuery } from "@/app/types/DataTypes";
 import { ObjectId } from "mongodb";
+import { startOfDay, startOfMonth, startOfWeek } from "date-fns";
 
 export async function GET(request: Request) {
     try{
@@ -20,21 +21,47 @@ export async function GET(request: Request) {
         
         // status filter
         const statusQuery = searchParams.get('status');
-        if (statusQuery && statusQuery !== 'All') {
+        if (statusQuery && statusQuery !== 'All Status') {
              query.status = statusQuery as 'Queued' | 'Running' | 'Completed' | 'Failed';
         }
 
         // user filter
         const userQuery = searchParams.get('user');
-        if (userQuery && userQuery !== 'All') {
-            query.user = userQuery;
+        if (userQuery && userQuery !== 'All Users') {
+            // my analyses, my name is "John Doe"
+            query.user = 'John Doe';
         }
 
         // date filter
-        /*const dateQuery = searchParams.get('date');
-        if (dateQuery) {
-            query.date = { $gte: new Date(dateQuery), $lte: new Date(dateQuery) };
-        }*/
+        const timeRangeQuery = searchParams.get('timeRange');
+        let timeRangeFilter={};
+        if (timeRangeQuery && timeRangeQuery !== 'All Time') {
+            const now = new Date();
+            switch (timeRangeQuery) {
+                case 'Today':
+                    timeRangeFilter = { 
+                        updatedTime: { 
+                            $gte: startOfDay(now).toISOString()
+                        } 
+                    };
+                    break;
+                case 'This Week':
+                    timeRangeFilter = {
+                        updatedTime: {
+                            $gte: startOfWeek(now).toISOString()
+                        }
+                    };
+                    break;
+                case 'This Month':
+                    timeRangeFilter = {
+                        updatedTime: {
+                            $gte: startOfMonth(now).toISOString()
+                        }
+                    };
+                    break;
+            }
+        }
+
 
         // isArchived filter
         const isArchivedFilter = searchParams.get('isArchived');
@@ -42,8 +69,10 @@ export async function GET(request: Request) {
             query.isArchived = isArchivedFilter === 'true';
         }
 
-        console.log("table1 query:", query);
-        const table1Data = await Table1Model.find(query);
+        const combinedQuery = { ...query, ...timeRangeFilter };
+
+        console.log("table1 query:", combinedQuery);
+        const table1Data = await Table1Model.find(combinedQuery);
         return NextResponse.json(table1Data);
     } catch (error) {
         return NextResponse.json({ message: 'Table1:  Failed to fetch table data', error })

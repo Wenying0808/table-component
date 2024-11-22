@@ -17,14 +17,6 @@ interface DataFilterProps {
   width?: string;
 }
 
-export const StatusFilterOptions: Array<MenuItemOption> = [
-    {label: "All", value: "All"}, 
-    {label: "Completed", value: "Completed"}, 
-    {label: "Failed", value: "Failed"}, 
-    {label: "Queued", value: "Queued"}, 
-    {label: "Running", value: "Running"}
-];
-
 export const DataFilter = ({
   id,
   value,

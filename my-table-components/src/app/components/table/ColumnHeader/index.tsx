@@ -36,7 +36,7 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
         gap: '4px',
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: isDragging ? colors.alto : 'transparent',
-        borderRight: `1px solid ${colors.gallery}`,
+        borderRight: `1px solid ${colors.alto}`,
         paddingRight: '10px',
     }
 

@@ -1,7 +1,34 @@
 "use client";
 
-import { MenuItemOption } from "@/app/components/DataFilter";
+// React and hooks
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+// External libraries
+import { DndContext } from "@dnd-kit/core";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { Checkbox, SelectChangeEvent } from "@mui/material";
+import { 
+    createColumnHelper, 
+    flexRender, 
+    getCoreRowModel, 
+    getExpandedRowModel, 
+    getSortedRowModel, 
+    Row, 
+    SortingState, 
+    useReactTable 
+} from "@tanstack/react-table";
+
+// Types
+import { FilterParams, StatusFilter, TimeRangeFilter, WorkflowAnalysis } from "@/app/types/DataTypes";
+import { ExpandableRow } from "@/app/types/TableTypes";
+
+// Components
 import Navbar from "@/app/components/navbar/navbar";
+import Loader from "@/app/components/loader";
+import TableControlBar from "@/app/components/TableControlBar";
+import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
+
+// Table Components
 import { TableCellActions } from "@/app/components/table/ActionsCell";
 import { AddColumnModal } from "@/app/components/table/AddColumnModal";
 import ColumnHeader from "@/app/components/table/ColumnHeader";
@@ -10,22 +37,11 @@ import { TableCellStatus } from "@/app/components/table/StatusCell";
 import { Table2CellExpand } from "@/app/components/table/Table2CellExpand";
 import { Table2Row } from "@/app/components/table/Table2Row";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
-import TableControlBar from "@/app/components/TableControlBar";
-import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
-import { FilterParams, WorkflowAnalysis } from "@/app/types/DataTypes";
-import { ExpandableRow } from "@/app/types/TableTypes";
-import { DndContext } from "@dnd-kit/core";
-import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { Checkbox, SelectChangeEvent } from "@mui/material";
-import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, Row, SortingState, useReactTable } from "@tanstack/react-table";
-import React, { useCallback } from "react";
-import { useEffect, useMemo, useState } from "react";
-import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
-import Loader from "@/app/components/loader";
-import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
 import { checkboxStyle } from "@/app/components/table/ColumnHeaderCheckbox/ColumnHeaderCheckbox";
- 
 
+// Utils and Functions
+import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
+import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
 
 export default function Table2Page() {
     const columnHelper = createColumnHelper<WorkflowAnalysis>();
@@ -33,11 +49,9 @@ export default function Table2Page() {
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [nameFilter, setNameFilter] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
-    const [userFilter, setUserFilter] = useState<string>('All');
-    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>(
-        [{label: "All", value: "All"}]
-    );
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
+    const [userFilter, setUserFilter] = useState<string>('All Users');
+    const [timeRangeFilter, setTimeRangeFilter] = useState<TimeRangeFilter>('All Time');
     const [isArchivedFilter, setIsArchivedFilter] = useState<boolean>(false);
     const [sorting, setSorting] = useState<SortingState>([ {id: 'updatedTime', desc: true} ]);
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -303,6 +317,7 @@ export default function Table2Page() {
         name: nameFilter,
         status: statusFilter,
         user: userFilter,
+        timeRange: timeRangeFilter,
         isArchived: isArchivedFilter,
     }) => {
         try{
@@ -318,6 +333,9 @@ export default function Table2Page() {
             if (filters.user) {
                 params.append('user', filters.user);
             }
+            if (filters.timeRange) {
+                params.append('timeRange', filters.timeRange);
+            }
             if (filters.isArchived !== undefined) {
                 params.append('isArchived', filters.isArchived.toString());
             } 
@@ -331,7 +349,7 @@ export default function Table2Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }, [nameFilter, statusFilter, userFilter, isArchivedFilter]);
+    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
         try{
@@ -363,59 +381,64 @@ export default function Table2Page() {
             if (!response.ok) {
                 throw new Error('Failed to add data to table2');
             }
-            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Failed to add data:', error);
         } finally {
             setIsAddingData(false);
         }
-    }, [handleFetchData, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleNameSearch = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
             setNameFilter(e.target.value);
-            await handleFetchData({name: e.target.value, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({name: e.target.value, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Failed to search table2 data by name:', error);
         }
-    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleClearNameSearch = useCallback(async () => {
         try{
             setNameFilter('');
-            await handleFetchData({name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({name: '', status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Failed to clear search:', error);
         }
-    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleStatusFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
         try {
-            setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
-            await handleFetchData({name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter, isArchived: isArchivedFilter});
+            setStatusFilter(e.target.value as StatusFilter);
+            await handleFetchData({name: nameFilter, status: e.target.value as StatusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Failed to filter table2 data by status:', error);
         }
-    }, [handleFetchData, nameFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, nameFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUserFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
         try { 
             setUserFilter(e.target.value);
-            await handleFetchData({name: nameFilter, status: statusFilter, user: e.target.value, isArchived: isArchivedFilter});
+            await handleFetchData({name: nameFilter, status: statusFilter, user: e.target.value, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Failed to filter table2 data by user:', error);
         }
-    }, [handleFetchData, nameFilter, statusFilter, isArchivedFilter]);
+    }, [handleFetchData, nameFilter, statusFilter, timeRangeFilter, isArchivedFilter]);
+
+    const handleTimeRangeFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
+        setTimeRangeFilter(e.target.value as TimeRangeFilter);
+    }, []);
 
     const handleArchiveFilterChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         try{
             setIsArchivedFilter(e.target.checked);
             setSelectedRows([]);
-            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: e.target.checked});
         } catch (error) {
             console.error('Failed to filter table2 data by archive:', error);
         }
-    }, [handleFetchData, nameFilter, statusFilter, userFilter]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter]);
+
 
     const handleArchiveSelectedRows = useCallback(async () => {
         try {
@@ -431,14 +454,14 @@ export default function Table2Page() {
             if (!response.ok) {
                 throw new Error('Failed to archive selected rows');
             }
-            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch(error){
             console.error('Failed to archive selected rows:', error);
         } finally {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -454,14 +477,14 @@ export default function Table2Page() {
             if (!response.ok) {
                 throw new Error('Failed to unarchive selected rows');
             }
-            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch(error){
             console.error('Failed to unarchive selected rows:', error);
         } finally {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     
     useEffect(() => {
@@ -478,17 +501,18 @@ export default function Table2Page() {
                     nameFilter={nameFilter}
                     statusFilter={statusFilter}
                     userFilter={userFilter}
+                    timeRangeFilter={timeRangeFilter}
                     isArchivedFilter={isArchivedFilter}
                     selectedRows={selectedRows}
                     totalRows={data.length}
                     isAddingData={isAddingData}
                     isArchivingData={isArchivingData}
                     isUnarchivingData={isUnarchivingData}
-                    userFilterOptions={userFilterOptions}
                     onNameSearch={handleNameSearch}
                     onClearNameSearch={handleClearNameSearch}
                     onStatusFilterChange={handleStatusFilterChange}
                     onUserFilterChange={handleUserFilterChange}
+                    onTimeRangeFilterChange={handleTimeRangeFilterChange}
                     onArchiveFilterChange={handleArchiveFilterChange}
                     onAddData={handleAddData}
                     onArchiveRows={handleArchiveSelectedRows}
