@@ -5,10 +5,11 @@ import { LoadingButton } from "@mui/lab";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ScatterPlotOutlinedIcon from '@mui/icons-material/ScatterPlotOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 
 import { colors } from "@/app/styles/colors";
 import { spacing } from "@/app/styles/spacing";
-import { DataFilter, StatusFilterOptions, MenuItemOption } from "@/app/components/DataFilter";
+import { DataFilter, MenuItemOption } from "@/app/components/DataFilter";
 
 import Search from "@/app/components/Search";
 
@@ -18,17 +19,18 @@ interface TableControlBarProps {
     nameFilter: string;
     statusFilter: string;
     userFilter: string;
+    timeRangeFilter: string;
     isArchivedFilter: boolean;
     selectedRows: string[];
     totalRows: number;
     isAddingData: boolean;
     isArchivingData: boolean;
     isUnarchivingData: boolean;
-    userFilterOptions: Array<MenuItemOption>;
     onNameSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onClearNameSearch: () => void;
     onStatusFilterChange: (e: SelectChangeEvent<string>) => void;
     onUserFilterChange: (e: SelectChangeEvent<string>) => void;
+    onTimeRangeFilterChange: (e: SelectChangeEvent<string>) => void;
     onArchiveFilterChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onAddData: () => void;
     onArchiveRows: () => void;
@@ -67,22 +69,43 @@ const secondaryButtonStyle = {
     color: colors.azure,
 }
 
+const statusFilterOptions: Array<MenuItemOption> =[
+    {label: "All Status", value: "All Status"},
+    {label: "Queued", value: "Queued"},
+    {label: "Running", value: "Running"},
+    {label: "Completed", value: "Completed"},
+    {label: "Failed", value: "Failed"}
+];
+
+const userFilterOptions: Array<MenuItemOption> =[
+    {label: "All Users", value: "All Users"},
+    {label: "My Analyses", value: "My Analyses"}
+];
+
+const timeRangeFilterOptions: Array<MenuItemOption> =[
+    {label: "All Time", value: "All Time"},
+    {label: "Today", value: "Today"},
+    {label: "This Week", value: "This Week"},
+    {label: "This Month", value: "This Month"}
+];
+
 
 const TableControlBar = memo(({
     nameFilter,
     statusFilter,
     userFilter,
+    timeRangeFilter,
     isArchivedFilter,
     selectedRows,
     totalRows,
     isAddingData,
     isArchivingData,
     isUnarchivingData,
-    userFilterOptions,
     onNameSearch,
     onClearNameSearch,
     onStatusFilterChange,
     onUserFilterChange,
+    onTimeRangeFilterChange,
     onArchiveFilterChange,
     onAddData,
     onArchiveRows,
@@ -101,7 +124,7 @@ const TableControlBar = memo(({
                     id="status-filter"
                     value={statusFilter}
                     icon={<ScatterPlotOutlinedIcon/>}
-                    options={StatusFilterOptions}
+                    options={statusFilterOptions}
                     onChange={onStatusFilterChange}
                 />
                 <DataFilter 
@@ -110,6 +133,13 @@ const TableControlBar = memo(({
                     icon={<PersonOutlineIcon />}
                     options={userFilterOptions}
                     onChange={onUserFilterChange}
+                />
+                <DataFilter 
+                    id="time-filter"
+                    value={timeRangeFilter}
+                    icon={<AccessTimeOutlinedIcon />}
+                    options={timeRangeFilterOptions}
+                    onChange={onTimeRangeFilterChange}
                 />
                 <ArchiveFilter 
                     isArchived={isArchivedFilter}

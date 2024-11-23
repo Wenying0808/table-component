@@ -16,7 +16,6 @@ import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortabl
 import Navbar from "@/app/components/navbar/navbar";
 import TableControlBar from "@/app/components/TableControlBar";
 import Loader from "@/app/components/loader";
-import { MenuItemOption } from "@/app/components/DataFilter";
 
 //Table Copmonents
 import PlaceholderNoResult from "@/app/components/table/PlaceholderNoResult";
@@ -27,39 +26,28 @@ import { ColumnHeaderAdd } from "@/app/components/table/ColumnHeaderAdd";
 import { AddColumnModal } from "@/app/components/table/AddColumnModal";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
 import { Table1Row } from "@/app/components/table/Table1Row";
+import { checkboxStyle } from "@/app/components/table/ColumnHeaderCheckbox/ColumnHeaderCheckbox";
 
 // Utilities and types
-import { colors } from "@/app/styles/colors";
-import { BaseAnalysis, FilterParams } from "@/app/types/DataTypes";
-import TableColumnsManagement from "@/app/tableManagement/tableColumnsManagement";
+import { BaseAnalysis, FilterParams, StatusFilter, TimeRangeFilter } from "@/app/types/DataTypes";
+import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
+import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
 
 // Virtulization
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 
- // styles
-const checkboxStyle = {
-    color: colors.azure,
-    '&.Mui-checked': {
-        color: colors.azure,
-    },
-    '&.Mui-indeterminate': {
-        color: colors.azure,
-    }
-}
 
 
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
-    const [userFilterOptions, setUserFilterOptions] = useState<Array<MenuItemOption>>(
-        [{label: "All", value: "All"}]
-    );
     const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
     const [isAddingData, setIsAddingData] = useState<boolean>(false);
     const [nameFilter, setNameFilter] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<'All' | 'Queued' | 'Running' | 'Completed' | 'Failed'>('All');
-    const [userFilter, setUserFilter] = useState<string>('All');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('All Status');
+    const [userFilter, setUserFilter] = useState<string>('All Users');
+    const [timeRangeFilter, setTimeRangeFilter] = useState<TimeRangeFilter>('All Time');
     const [isArchivedFilter, setIsArchivedFilter] = useState<boolean>(false);
     const [sorting, setSorting] = useState<SortingState>([ 
         { id: 'updatedTime', desc: true }
@@ -97,7 +85,6 @@ export default function Table1Page() {
         }
     })
 
-
     // column definitions for add column dropdown menu options
     const availableColumns = useMemo(() => {
         if (data.length === 0) return [];
@@ -112,16 +99,15 @@ export default function Table1Page() {
             .sort((a, b) => a.value.localeCompare(b.label));
     }, [data, columnVisibility]);
 
-
     // Selection Functions
 
-    const handleRowSelection = (rowId: string) => {
+    const handleRowSelection = useCallback((rowId: string) => {
         setSelectedRows(prev => 
             prev.includes(rowId)
                 ? prev.filter(id => id !== rowId)
                 : [...prev, rowId]
         );
-    }
+    }, []);
     const handleSelectAllRows = useCallback(() => {
         if (data.length > 0 && selectedRows.length === data.length) {
             /*console.log('Unselecting all rows');*/
@@ -275,7 +261,7 @@ export default function Table1Page() {
             ),
             enableHiding: false,
         })
-    ], [selectedRows, data, handleSelectAllRows, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
+    ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
     // table definition
     const table = useReactTable({ 
@@ -319,6 +305,7 @@ export default function Table1Page() {
         name: nameFilter, 
         status: statusFilter,
         user: userFilter,
+        timeRange: timeRangeFilter,
         isArchived: isArchivedFilter
     }) => {
         try{
@@ -334,6 +321,9 @@ export default function Table1Page() {
             if (filters.user) {
                 params.append('user', filters.user);
             }
+            if (filters.timeRange) {
+                params.append('timeRange', filters.timeRange);
+            }
             if (filters.isArchived !== undefined) {
                 params.append('isArchived', filters.isArchived.toString());
             }
@@ -343,27 +333,23 @@ export default function Table1Page() {
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
             setData(table1);
-            return table1;
+            
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
             setIsDataLoading(false);
         }
-    }, [nameFilter, statusFilter, userFilter, isArchivedFilter]);
+    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
-        const statusOptions = ["Queued", "Running", "Completed", "Failed"];
-        const userOptions = ["Paul Smith", "John Doe", "Jane Lin", "Alice Johnson", "Bob Brown"];
-        const randomStatus = statusOptions[Math.floor(Math.random() * statusOptions.length)];
-        const randomUser = userOptions[Math.floor(Math.random() * userOptions.length)];
         try {
             setIsAddingData(true);
             const newData = {
                 "name": `New Analysis ${Math.floor(Math.random() * 100)}`,
                 "status": randomStatus,
                 "user": randomUser,
-                "actions": ['Report'],
-                "duration": 10,
+                "actions": statusProps.actions,
+                "duration": statusProps.duration,
                 "isArchived": false,
             };
             const response = await fetch('/pages/api/table1', {
@@ -373,13 +359,13 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to add data');
             }
-            await handleFetchData();
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error adding data:', error);
         } finally {
             setIsAddingData(false);
         }
-    }, [handleFetchData]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     // Filter Functions
 
@@ -388,38 +374,41 @@ export default function Table1Page() {
             const searchValue = e.target.value;
             /*console.log("filter:", searchValue);*/
             setNameFilter(searchValue);
-            await handleFetchData({ name: searchValue, status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
+            await handleFetchData({ name: searchValue, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error searching by name:', error);
         }
-    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
     /*console.log("search value:", searchValue);*/
 
-    const handleClearSearch = useCallback(async () => {
+    const handleClearNameSearch = useCallback(async () => {
         try{
             setNameFilter('');
-            const data = await handleFetchData({ name: '', status: statusFilter, user: userFilter, isArchived: isArchivedFilter});
-            setData(data);
+            await handleFetchData({ name: '', status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error clearing search:', error);
         }
-    }, [handleFetchData, statusFilter, userFilter, isArchivedFilter]);
+    }, [handleFetchData, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleStatusFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
-        setStatusFilter(e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed');
-        await handleFetchData({ name: nameFilter, status: e.target.value as 'All' | 'Queued' | 'Running' | 'Completed' | 'Failed', user: userFilter, isArchived: isArchivedFilter});
-    }, [handleFetchData, nameFilter, userFilter, isArchivedFilter]);
+        setStatusFilter(e.target.value as StatusFilter);
+        await handleFetchData({ name: nameFilter, status: e.target.value as StatusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
+    }, [handleFetchData, nameFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUserFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
         setUserFilter(e.target.value);
-        await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value, isArchived: isArchivedFilter});
-    }, [handleFetchData, nameFilter, statusFilter, isArchivedFilter]);
+        await handleFetchData({ name: nameFilter, status: statusFilter, user: e.target.value, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
+    }, [handleFetchData, nameFilter, statusFilter, timeRangeFilter, isArchivedFilter]);
+
+    const handleTimeRangeFilterChange = useCallback(async (e: SelectChangeEvent<string>) => {
+        setTimeRangeFilter(e.target.value as TimeRangeFilter);
+    }, []);
 
     const handleArchiveFilterChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsArchivedFilter(e.target.checked);
         setSelectedRows([]);
-        await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, isArchived: e.target.checked});
-    }, [handleFetchData, nameFilter, statusFilter, userFilter]);
+        await handleFetchData({ name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: e.target.checked});
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter]);
 
     const handleArchiveSelectedRows = useCallback(async () => {
         try{
@@ -435,14 +424,14 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to archive selected rows');
             }
-            await handleFetchData();
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error archiving selected rows:', error);
         } finally {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -458,14 +447,14 @@ export default function Table1Page() {
             if (!response.ok) {
                 throw new Error('Failed to archive selected rows');
             }
-            await handleFetchData();
+            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
         } catch (error) {
             console.error('Error unarchiving selected rows:', error);
         } finally {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
  
     useEffect(() => {
@@ -481,17 +470,18 @@ export default function Table1Page() {
                     nameFilter={nameFilter}
                     statusFilter={statusFilter}
                     userFilter={userFilter}
+                    timeRangeFilter={timeRangeFilter}
                     isArchivedFilter={isArchivedFilter}
                     selectedRows={selectedRows}
                     totalRows={data.length}
                     isAddingData={isAddingData}
                     isArchivingData={isArchivingData}
                     isUnarchivingData={isUnarchivingData}
-                    userFilterOptions={userFilterOptions}
                     onNameSearch={handleNameSearch}
-                    onClearNameSearch={handleClearSearch}
+                    onClearNameSearch={handleClearNameSearch}
                     onStatusFilterChange={handleStatusFilterChange}
                     onUserFilterChange={handleUserFilterChange}
+                    onTimeRangeFilterChange={handleTimeRangeFilterChange}
                     onArchiveFilterChange={handleArchiveFilterChange}
                     onAddData={handleAddData}
                     onArchiveRows={handleArchiveSelectedRows}

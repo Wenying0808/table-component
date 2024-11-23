@@ -78,16 +78,11 @@ a {
   height: fit-content;
 }
 
-.table1 {
+.table1, .table2, .table3 {
   border-collapse: collapse;
   width: 100%;
 }
 
-.table2, .table3 {
-  height: 70vh;
-  overflow-y: auto;
-  display: block; 
-}
 
 @media (max-width: 600px) {
   .table-page {
