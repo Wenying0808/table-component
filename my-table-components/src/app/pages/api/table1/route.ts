@@ -10,6 +10,7 @@ export async function GET(request: Request) {
         await connectToMongoDB();
 
         const { searchParams } = new URL(request.url);
+        
         //query object
         const query: MongoTableDataQuery = {};
 

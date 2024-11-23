@@ -56,6 +56,8 @@ export default function Table1Page() {
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
 
+    const basePath = process.env.GITHUB_PATH || ''; 
+
     const {
         columnVisibility,
         setColumnVisibility,
@@ -329,7 +331,7 @@ export default function Table1Page() {
             }
             
             const queryString = params.toString();
-            const response = await fetch(`/pages/api/table1?${queryString}`);
+            const response = await fetch(`${basePath}/pages/api/table1?${queryString}`);
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
             setData(table1);
@@ -339,7 +341,7 @@ export default function Table1Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
         try {
@@ -352,7 +354,7 @@ export default function Table1Page() {
                 "duration": statusProps.duration,
                 "isArchived": false,
             };
-            const response = await fetch('/pages/api/table1', {
+            const response = await fetch(`${basePath}/pages/api/table1`, {
                 method: 'POST',
                 body: JSON.stringify(newData)
             });
@@ -365,7 +367,7 @@ export default function Table1Page() {
         } finally {
             setIsAddingData(false);
         }
-    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     // Filter Functions
 
@@ -417,7 +419,7 @@ export default function Table1Page() {
                 ids: selectedRows,
                 action: "archive"
             }
-            const response = await fetch(`/pages/api/table1`, {
+            const response = await fetch(`${basePath}/pages/api/table1`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -431,7 +433,7 @@ export default function Table1Page() {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -440,7 +442,7 @@ export default function Table1Page() {
                 ids: selectedRows,
                 action: "unarchive"
             }
-            const response = await fetch(`/pages/api/table1`, {
+            const response = await fetch(`${basePath}/pages/api/table1`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -454,7 +456,7 @@ export default function Table1Page() {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleClearFilters = useCallback(async () => {
         try { 

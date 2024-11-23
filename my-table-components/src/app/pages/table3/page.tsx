@@ -38,6 +38,8 @@ export default function Table3Page() {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
+    const basePath = process.env.GITHUB_PATH || ''; 
+
     const {
         columnOrder,
         setColumnOrder,
@@ -323,7 +325,7 @@ export default function Table3Page() {
                 params.append('isArchived', filters.isArchived.toString());
             } 
             const queryString = params.toString();
-            const response = await fetch(`/pages/api/table3?${queryString}`);
+            const response = await fetch(`${basePath}/pages/api/table3?${queryString}`);
             const table3Data = await response.json();
             setData(table3Data);
         } catch (error) {
@@ -331,7 +333,7 @@ export default function Table3Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
         try{
@@ -365,7 +367,7 @@ export default function Table3Page() {
 
             console.log("newData:", newData);
 
-            const response = await fetch(`/pages/api/table3`, {
+            const response = await fetch(`${basePath}/pages/api/table3`, {
                 method: 'POST',
                 body: JSON.stringify(newData)
             });
@@ -378,7 +380,7 @@ export default function Table3Page() {
         } finally {
             setIsAddingData(false);
         }
-    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleNameSearch = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
@@ -438,21 +440,27 @@ export default function Table3Page() {
                 ids: selectedRows,
                 action: "archive"
             }
-            const response = await fetch(`/pages/api/table3`, {
+            const response = await fetch(`${basePath}/pages/api/table3`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
             if (!response.ok) {
                 throw new Error('Failed to archive selected rows');
             }
-            await handleFetchData({name: nameFilter, status: statusFilter, user: userFilter, timeRange: timeRangeFilter, isArchived: isArchivedFilter});
+            await handleFetchData({
+                name: nameFilter, 
+                status: statusFilter, 
+                user: userFilter, 
+                timeRange: timeRangeFilter, 
+                isArchived: isArchivedFilter
+            });
         } catch(error){
             console.error('Failed to archive selected rows:', error);
         } finally {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -461,7 +469,7 @@ export default function Table3Page() {
                 ids: selectedRows,
                 action: "unarchive"
             }
-            const response = await fetch(`/pages/api/table3`, {
+            const response = await fetch(`${basePath}/pages/api/table3`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -475,7 +483,7 @@ export default function Table3Page() {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
     
     const handleClearFilters = useCallback(async () => {
         try { 
