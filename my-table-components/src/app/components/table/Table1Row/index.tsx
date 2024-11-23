@@ -1,4 +1,4 @@
-import { colors } from '../../../styles/colors';
+import { colors } from '@/app/styles/colors';
 import { useState } from 'react';
 
 interface Table1RowProps {

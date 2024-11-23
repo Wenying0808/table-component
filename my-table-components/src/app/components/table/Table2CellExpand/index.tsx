@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { ExpandableRow, TableCellExpandProps } from '@/app/types/TableTypes';
-import { colors } from '../../../styles/colors';
+import { colors } from '@/app/styles/colors';
 
 export const Table2CellExpand = <T extends ExpandableRow>({ row }: TableCellExpandProps<T>) => {
     const cellStyles = {

@@ -1,5 +1,5 @@
-import { TableRowProps, ExpandableRow } from '../../../types/TableTypes';
-import { colors } from '../../../styles/colors';
+import { TableRowProps, ExpandableRow } from '@/app/types/TableTypes';
+import { colors } from '@/app/styles/colors';
 
 export const Table3Row = <T extends ExpandableRow>({ row, children }: TableRowProps<T>) => {
     const rowStyles = {

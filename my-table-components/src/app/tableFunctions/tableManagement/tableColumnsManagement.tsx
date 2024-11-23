@@ -1,7 +1,7 @@
 import { DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
-import { ColumnOption, TableColumnsManagementProps } from '../types/TableTypes';
+import { ColumnOption, TableColumnsManagementProps } from '@/app/types/TableTypes';
 
 export default function TableColumnsManagement( {initialColumnOrder, initialColumnVisibility}:  TableColumnsManagementProps) {
     const [columnOrder, setColumnOrder] = useState<string[]>(initialColumnOrder);
