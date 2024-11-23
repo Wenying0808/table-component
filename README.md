@@ -17,7 +17,7 @@
 ## Table Data Management
 
 - Fetch Data from Mongodb by API
-- Create, Read, Update, Delete table data by API
+- Create, Read, Update table data by API
 
 ## Table Interactions
 

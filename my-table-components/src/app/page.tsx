@@ -1,5 +1,20 @@
 import Navbar from "@/app/components/navbar/navbar";
-import { Container, Typography, Paper, List, ListItem, ListItemText, Grid2 } from '@mui/material';
+import { Container, Typography, Paper, List, ListItem, ListItemText, Grid2, ListItemIcon } from '@mui/material';
+import CircleIcon from '@mui/icons-material/Circle';
+import { colors } from '@/app/styles/colors';
+
+const PaperStyle = {
+  p: 3,
+  height: '100%',
+  borderRadius: '16px',
+  backgroundColor: colors.thunder,
+  color: colors.white
+}
+
+const CircleIconStyle = {
+  fontSize: 8,
+  color: colors.white
+}
 
 export default function Home() {
   return (
@@ -7,16 +22,16 @@ export default function Home() {
       <Navbar />
       <Container maxWidth="lg" sx={{ py: 2 }}>
         <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Table Components Introduction
+          Table Components Intro
         </Typography>
         <Typography variant="body1" component="h1" align="center" gutterBottom>
-          Reusable React table components built with MUI and Tanstack Table
+          Reusable React Table Components Built By MUI and Tanstack Table
         </Typography>
         
-        <Grid2 container spacing={4} sx={{ mt: 2 }}>
+        <Grid2 container spacing={4} sx={{ mt: 10 , ml: 5, mr: 5}}>
           <Grid2 size="grow">
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
+            <Paper sx={PaperStyle}>
+              <Typography variant="h5" gutterBottom>
                 Basic Data Display
               </Typography>
               <Typography variant="body1" gutterBottom>
@@ -24,9 +39,15 @@ export default function Home() {
               </Typography>
               <List>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Fetch Data from database by API" />
                 </ListItem>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Create, Read, Update, Delete table data by API" />
                 </ListItem>
               </List>
@@ -34,8 +55,8 @@ export default function Home() {
           </Grid2>
 
           <Grid2 size="grow">
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Typography variant="h6" gutterBottom>
+            <Paper sx={PaperStyle}>
+              <Typography variant="h5" gutterBottom>
                 Table Interactions
               </Typography>
               <Typography variant="body1" gutterBottom>
@@ -43,18 +64,33 @@ export default function Home() {
               </Typography>
               <List>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Expand/collapse nestedrows" />
                 </ListItem>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Basic sorting functionality" />
                 </ListItem>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Search/filter capabilities" />
                 </ListItem>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Add/remove columns" />
                 </ListItem>
                 <ListItem>
+                  <ListItemIcon>
+                    <CircleIcon sx={CircleIconStyle} />
+                  </ListItemIcon>
                   <ListItemText primary="Reorder columns" />
                 </ListItem>
               </List>

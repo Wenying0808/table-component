@@ -35,7 +35,17 @@ export default function ArchiveFilter({
                     sx={{
                         '& .MuiSwitch-track': {
                             backgroundColor: colors.white,
-                        }}}
+                        },
+                        '& .Mui-checked': {
+                            '& .MuiSwitch-thumb': {
+                                backgroundColor: `${colors.azure} !important`,
+                            },
+                            '& + .MuiSwitch-track': {
+                                backgroundColor: `${colors.azure} !important`,
+                                opacity: 0.6,
+                            },
+                        },
+                    }}
                 />
             </Tooltip>
         </div>
