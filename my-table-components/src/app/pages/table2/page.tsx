@@ -486,6 +486,26 @@ export default function Table2Page() {
         }
     }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
+    const handleClearFilters = useCallback(async () => {
+        try { 
+            setNameFilter('');
+            setStatusFilter('All Status');
+            setUserFilter('All Users');
+            setTimeRangeFilter('All Time');
+            setIsArchivedFilter(false);
+            setSelectedRows([]);
+            
+            await handleFetchData({
+                name: '', 
+                status: 'All Status', 
+                user: 'All Users', 
+                timeRange: 'All Time', 
+                isArchived: false
+            });
+        } catch (error) {
+            console.error('Failed to clear filters:', error);
+        }
+    }, [handleFetchData]);
     
     useEffect(() => {
         handleFetchData();
@@ -567,7 +587,7 @@ export default function Table2Page() {
                         </table>
                     </DndContext>
                     </>
-                    : <PlaceholderNoResult />
+                    : <PlaceholderNoResult onClearFilters={handleClearFilters} />
                 }
             </main>
         </div>

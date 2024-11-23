@@ -9,7 +9,7 @@ export const Table3Row = <T extends ExpandableRow>({ row, children }: TableRowPr
             fontWeight: 600,
             backgroundColor: `${colors.white}`,
             height: "46px",
-            borderTop: `1px solid ${colors.azure}`,
+            borderTop: `1px solid ${colors.gallery}`,
         },
         childRow: {
             fontSize: "13px",
