@@ -101,13 +101,13 @@ export default function Table1Page() {
 
     // Selection Functions
 
-    const handleRowSelection = (rowId: string) => {
+    const handleRowSelection = useCallback((rowId: string) => {
         setSelectedRows(prev => 
             prev.includes(rowId)
                 ? prev.filter(id => id !== rowId)
                 : [...prev, rowId]
         );
-    }
+    }, []);
     const handleSelectAllRows = useCallback(() => {
         if (data.length > 0 && selectedRows.length === data.length) {
             /*console.log('Unselecting all rows');*/
@@ -261,7 +261,7 @@ export default function Table1Page() {
             ),
             enableHiding: false,
         })
-    ], [selectedRows, data, handleSelectAllRows, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
+    ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
     // table definition
     const table = useReactTable({ 

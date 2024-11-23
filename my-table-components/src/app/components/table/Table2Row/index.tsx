@@ -6,7 +6,7 @@ export const Table2Row = <T extends ExpandableRow>({ row, children }: TableRowPr
         parentRow: {
             fontSize: "14px",
             fontWeight: 600,
-            borderBottom: `1px solid ${colors.alto}`,
+            borderTop: `1px solid ${colors.gallery}`,
             height: "46px",
         },
         childRow: {
