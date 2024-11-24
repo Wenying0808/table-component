@@ -31,7 +31,9 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
     const spanStyle = {
         transform: CSS.Transform.toString(transform),
         transition,
+        width: '100%',
         display: 'flex',
+        flex: 1,
         alignItems: 'center',
         gap: '4px',
         opacity: isDragging ? 0.5 : 1,
@@ -40,10 +42,24 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
         paddingRight: '10px',
     }
 
+    const labelStyle = {
+        overflow: 'hidden' ,
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        flex: 1,
+    }
+
+    const headerActionsStyle = {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+    }
+
     const dragIndicatorStyle = {
         color: colors.manatee,
         cursor: isDragging ? 'grabbing' : 'grab',
     }
+
 
     return (
         <span 
@@ -54,35 +70,33 @@ export default function ColumnHeader({ id, children, isSortable = false, sorting
             ref={setNodeRef}
             
         >
-            <div style={{ 
-                overflow: 'hidden' ,
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis'
-            }}>
+            <div style={labelStyle}>
                 {children}
             </div>
-            {isSortable && (sortingState || isHovered) &&
-                getSortingIcon(sortingState)
-            }
-            {columnIsRemoveable && isHovered && 
-                <Tooltip title="Remove Column" placement="top">
-                    <CancelIcon 
-                        onClick={handleRemoveColumn} 
-                        style={{
-                            color: colors.manatee, 
-                            cursor: 'pointer'
-                        }} 
+            <div style={headerActionsStyle}>
+                {isSortable && (sortingState || isHovered) &&
+                    getSortingIcon(sortingState)
+                }
+                {columnIsRemoveable && isHovered && 
+                    <Tooltip title="Remove Column" placement="top">
+                        <CancelIcon 
+                            onClick={handleRemoveColumn} 
+                            style={{
+                                color: colors.manatee, 
+                                cursor: 'pointer'
+                            }} 
+                        />
+                    </Tooltip>
+                }
+                {isHovered && 
+                    <DragIndicatorIcon 
+                        style={dragIndicatorStyle} 
+                        
+                        {...attributes}
+                        {...listeners}
                     />
-                </Tooltip>
-            }
-            {isHovered && 
-                <DragIndicatorIcon 
-                    style={dragIndicatorStyle} 
-                    
-                    {...attributes}
-                    {...listeners}
-                />
-            }
+                }
+            </div>
         </span>
     )
 }

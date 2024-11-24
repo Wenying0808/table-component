@@ -8,7 +8,7 @@ import { Checkbox, SelectChangeEvent } from "@mui/material";
 
 
 // Table related external libraries
-import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
+import { ColumnResizeMode, createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 
@@ -37,8 +37,6 @@ import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tabl
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 
-
-
 export default function Table1Page() {
     const columnHelper = createColumnHelper<BaseAnalysis>();
     const [data, setData] = useState<BaseAnalysis[]>([]);
@@ -55,6 +53,7 @@ export default function Table1Page() {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
+    const [columnSizing, setColumnSizing] = useState({});
 
     const basePath = process.env.GITHUB_PATH || ''; 
 
@@ -140,104 +139,151 @@ export default function Table1Page() {
                     sx={checkboxStyle}
                 />
             ),
+            enableResizing: false,
+            size: 50,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Name
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Name
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>   
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
+            header: ({ header }) => (
+                <div className="resizable-header">
                 <ColumnHeader 
-                    id={column.id}
+                    id={header.column.id}
                     isSortable={true} 
-                    sortingState={column.getIsSorted()}
+                    sortingState={header.column.getIsSorted()}
                     columnIsRemoveable={true}
                     handleSorting={() => {
-                        column.toggleSorting();
+                        header.column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
+                        handleRemoveColumn(header.column.id);
                     }}
-                >
-                    Duration
-                </ColumnHeader>
+                    >
+                        Duration
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric'
         }),
         columnHelper.accessor('status', {
             cell: info => <TableCellStatus data={info.getValue()} />,
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Status
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Status
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric'
         }),
         columnHelper.accessor('user', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
                     isSortable={true} 
-                    sortingState={column.getIsSorted()}
+                    sortingState={header.column.getIsSorted()}
                     columnIsRemoveable={true}
                     handleSorting={() => {
-                        column.toggleSorting();
+                        header.column.toggleSorting();
                     }}
                     handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
+                        handleRemoveColumn(header.column.id);
                     }}
                 >
                     User
-                </ColumnHeader>
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('updatedTime', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Updated Time
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                            }}
+                    >
+                        Updated Time
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
@@ -251,7 +297,9 @@ export default function Table1Page() {
                 >
                     Actions
                 </ColumnHeader>
-            )
+            ),
+            enableResizing: false,
+            size: 120,
         }),
         columnHelper.display({
             id: 'add',
@@ -262,6 +310,8 @@ export default function Table1Page() {
                 />
             ),
             enableHiding: false,
+            enableResizing: false,
+            size: 50,
         })
     ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
@@ -273,12 +323,22 @@ export default function Table1Page() {
             columnOrder,
             sorting,
             columnVisibility,
+            columnSizing,
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         onColumnOrderChange: setColumnOrder,
         onSortingChange: setSorting,
         onColumnVisibilityChange: setColumnVisibility,
+        onColumnSizingChange: setColumnSizing,
+        defaultColumn: {
+            size: 200, 
+            minSize: 50, 
+            maxSize: 500,
+            enableResizing: true,
+        },
+        columnResizeMode: 'onChange' as ColumnResizeMode,
+        enableColumnResizing: true,
     });
 
     // Virtualization
@@ -524,7 +584,7 @@ export default function Table1Page() {
                         onDragEnd={handleDragEnd}
                     >
                         <div ref={tableContainerRef} className="table1-container" style={{ height: '70vh', width: '80vw', overflow: 'auto' }}>
-                            <table className="table1">
+                            <table className="table1" style={{ width: table.getTotalSize() }}>
                                 <thead className="sticky-column-header">
                                     {table.getHeaderGroups().map(headerGroup => (
                                         <TableColumnHeaderRow key={headerGroup.id}>
@@ -533,7 +593,13 @@ export default function Table1Page() {
                                                 strategy={horizontalListSortingStrategy}
                                             >
                                                 {headerGroup.headers.map(header => (
-                                                    <th key={header.id}>
+                                                    <th 
+                                                        key={header.id} 
+                                                        style={{
+                                                            width: header.getSize(),
+                                                            position: 'relative',
+                                                        }}
+                                                    >
                                                         {flexRender(
                                                             header.column.columnDef.header,
                                                             header.getContext()

@@ -115,7 +115,7 @@ table {
 th {
   color: var(--black);
   text-align: left;
-  padding: 10px 20px;
+  padding: 10px 0 10px 20px;
 }
 
 td {
@@ -131,4 +131,23 @@ td {
 .table2 td:first-child, 
 .table3 td:first-child {
   padding: 0;
+}
+
+
+/* Resizable Header */
+.resizable-header {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 8px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
 }
