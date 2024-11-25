@@ -301,7 +301,7 @@ export default function Table1Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: 160,
+            size: 140,
         }),
         columnHelper.display({
             id: 'add',
@@ -335,7 +335,7 @@ export default function Table1Page() {
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
             size: 200, 
-            minSize: 80, 
+            minSize: 123, 
             maxSize: 500,
             enableResizing: true,
         },
@@ -586,7 +586,6 @@ export default function Table1Page() {
                         onDragEnd={handleDragEnd}
                     >
                         <div 
-                            className="table1-container" 
                             ref={tableContainerRef} 
                             style={{ 
                                 height: '70vh', 
