@@ -18,7 +18,9 @@ export const TableCellStatus = ({ data }: { data: string }) => {
     };
 
     const cellStyles = {
-        color: getStatusColor(data)
+        color: getStatusColor(data),
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
     }
 
     return (

@@ -123,22 +123,26 @@ export default function Table1Page() {
         columnHelper.display({
             id: 'select',
             header: () => (
-                <Checkbox
-                    checked={data.length > 0 && selectedRows.length === data.length}
-                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
-                    onChange={handleSelectAllRows}
-                    sx={checkboxStyle}
-                />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Checkbox
+                        checked={data.length > 0 && selectedRows.length === data.length}
+                        indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
+                        onChange={handleSelectAllRows}
+                        sx={checkboxStyle}
+                    />
+                </div>
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={selectedRows.includes(row.original._id!)}
-                    onChange={() => handleRowSelection(row.original._id!)}
-                    sx={checkboxStyle}
-                />
+                <div style={{ display: 'flex', justifyContent: 'center', marginLeft: '20px' }}>
+                    <Checkbox
+                        checked={selectedRows.includes(row.original._id!)}
+                        onChange={() => handleRowSelection(row.original._id!)}
+                        sx={checkboxStyle}
+                    />
+                </div>
             ),
             enableResizing: false,
-            size: 50,
+            size: 48,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -297,7 +301,7 @@ export default function Table1Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: 120,
+            size: 160,
         }),
         columnHelper.display({
             id: 'add',
@@ -309,7 +313,7 @@ export default function Table1Page() {
             ),
             enableHiding: false,
             enableResizing: false,
-            size: 50,
+            size: 100,
         })
     ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
@@ -331,7 +335,7 @@ export default function Table1Page() {
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
             size: 200, 
-            minSize: 50, 
+            minSize: 80, 
             maxSize: 500,
             enableResizing: true,
         },
@@ -357,7 +361,7 @@ export default function Table1Page() {
         ? totalHeight - (virtualRows[virtualRows.length - 1].end || 0)
         : 0;
 
-    console.log("virtualRows", virtualRows);
+    /*console.log("virtualRows", virtualRows);*/
 
 
     // data fetching and handling
@@ -581,8 +585,22 @@ export default function Table1Page() {
                         sensors={sensors}
                         onDragEnd={handleDragEnd}
                     >
-                        <div ref={tableContainerRef} className="table1-container" style={{ height: '70vh', width: '80vw', overflow: 'auto' }}>
-                            <table className="table1" style={{ width: table.getTotalSize() }}>
+                        <div 
+                            className="table1-container" 
+                            ref={tableContainerRef} 
+                            style={{ 
+                                height: '70vh', 
+                                width: '80vw', 
+                                overflow: 'auto' 
+                            }}
+                        >
+                            <table 
+                                className="table1" 
+                                style={{ 
+                                    width: table.getTotalSize(),
+                                    tableLayout: 'fixed',
+                                }}
+                            >
                                 <thead className="sticky-column-header">
                                     {table.getHeaderGroups().map(headerGroup => (
                                         <TableColumnHeaderRow key={headerGroup.id}>
@@ -629,17 +647,6 @@ export default function Table1Page() {
                                             );
                                         })}
                                     <tr style={{ height: `${paddingBottom}px` }} />
-                                    {/*table.getRowModel().rows.map(row => (
-                                        <Table1Row key={row.id}>
-                                            {row.getVisibleCells().map(cell => (
-                                                <td key={cell.id}>
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext())}
-                                                </td>
-                                            ))}
-                                        </Table1Row>
-                                    ))}*/}
                                 </tbody>
                             </table>
                         </div>
