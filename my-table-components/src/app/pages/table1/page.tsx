@@ -35,6 +35,7 @@ import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tabl
 
 // Virtulization
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { colors } from "@/app/styles/colors";
 
 
 export default function Table1Page() {
@@ -335,7 +336,7 @@ export default function Table1Page() {
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
             size: 200, 
-            minSize: 123, 
+            minSize: 120, 
             maxSize: 500,
             enableResizing: true,
         },
@@ -590,7 +591,8 @@ export default function Table1Page() {
                             style={{ 
                                 height: '70vh', 
                                 width: '80vw', 
-                                overflow: 'auto' 
+                                overflow: 'auto',
+                                backgroundColor: colors.white,
                             }}
                         >
                             <table 
