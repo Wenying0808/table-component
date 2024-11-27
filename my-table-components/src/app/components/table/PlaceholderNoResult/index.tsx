@@ -1,9 +1,12 @@
 import { colors } from "@/app/styles/colors";
 import { Button } from "@mui/material";
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const ClearFilterButtonStyle = {
-    backgroundColor: colors.alto,
-    color: colors.black,
+
+    border: '2px solid',
+    borderColor: colors.white,
+    color: colors.white,
     fontSize: '14px',
     borderRadius: '4px',
     padding: '8px 16px',
@@ -33,6 +36,8 @@ export default function PlaceholderNoResult({ onClearFilters }:  PlaceholderNoRe
             Please try a different search or clear filters
             <Button 
                 sx={ClearFilterButtonStyle}
+                variant="outlined"
+                endIcon={<CancelIcon />}
                 onClick={onClearFilters}
             >
                 Clear Filters
