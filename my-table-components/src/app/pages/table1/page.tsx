@@ -599,7 +599,6 @@ export default function Table1Page() {
                                 className="table1" 
                                 style={{ 
                                     width: table.getTotalSize(),
-                                    tableLayout: 'fixed',
                                 }}
                             >
                                 <thead className="sticky-column-header">
@@ -635,6 +634,7 @@ export default function Table1Page() {
                                                 <Table1Row 
                                                     key={row.id} 
                                                     height={`${virtualRow.size}px`}
+                                                    isSelected={selectedRows.includes(row.original._id!)}
                                                 >
                                                     {row.getVisibleCells().map(cell => (
                                                         <td key={cell.id}>
