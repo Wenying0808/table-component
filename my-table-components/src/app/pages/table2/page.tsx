@@ -8,6 +8,7 @@ import { DndContext } from "@dnd-kit/core";
 import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { Checkbox, SelectChangeEvent } from "@mui/material";
 import { 
+    ColumnResizeMode,
     createColumnHelper, 
     flexRender, 
     getCoreRowModel, 
@@ -42,6 +43,8 @@ import { checkboxStyle } from "@/app/components/table/ColumnHeaderCheckbox/Colum
 // Utils and Functions
 import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
 import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tableAddData/tableAddData";
+import { spacing } from "@/app/styles/spacing";
+import { colors } from "@/app/styles/colors";
 
 export default function Table2Page() {
     const columnHelper = createColumnHelper<WorkflowAnalysis>();
@@ -57,7 +60,7 @@ export default function Table2Page() {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
-
+    const [columnSizing, setColumnSizing] = useState({});
     const basePath = process.env.GITHUB_PATH || ''; 
     
     const {
@@ -146,11 +149,17 @@ export default function Table2Page() {
                     />
                 ) : null
             ),
+            enableResizing: false,
+            size: spacing.table_cell_select_width,
+            maxSize: spacing.table_cell_select_width,
         }),
         columnHelper.display({
             id: 'expand',
             cell: ({ row }) => <Table2CellExpand row={row as Row<ExpandableRow>} />,
-            header: () => <span className="table-header"></span>
+            header: () => <span className="table-header"></span>,
+            enableResizing: false,
+            size: spacing.table_cell_expand_width,
+            maxSize: spacing.table_cell_expand_width,
         }),
         columnHelper.accessor('_id', {
             cell: info => info.getValue(),
@@ -172,61 +181,88 @@ export default function Table2Page() {
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Name
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Name
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Duration
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Duration
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('status', {
             cell: info => <TableCellStatus data={info.getValue()} />,
-            header: ({ column }) => (
-                <ColumnHeader
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Status
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Status
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
@@ -240,41 +276,61 @@ export default function Table2Page() {
                 >
                     Actions
                 </ColumnHeader>
-            )
+            ),
+            enableResizing: false,
+            size: spacing.table_cell_actions_width,
         }),
         columnHelper.accessor('user', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id} 
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true} 
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >  
-                    User
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id} 
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true} 
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >  
+                        User
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
         }),
         columnHelper.accessor('updatedTime', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Updated Time
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Updated Time
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
@@ -308,10 +364,20 @@ export default function Table2Page() {
             sorting,
             columnVisibility,
             columnOrder,
+            columnSizing,
         },
         onSortingChange: setSorting,
         onColumnVisibilityChange: setColumnVisibility,
         onColumnOrderChange: setColumnOrder,
+        onColumnSizingChange: setColumnSizing,
+        defaultColumn: {
+            size: 200, 
+            minSize: 120, 
+            maxSize: 500,
+            enableResizing: true,
+        },
+        columnResizeMode: 'onChange' as ColumnResizeMode,
+        enableColumnResizing: true,
     });
 
     // fetch data
@@ -551,43 +617,63 @@ export default function Table2Page() {
                             onAddColumns={handleAddColumns}
                         />
                         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-                            <table className="table2">
-                            <thead className="sticky-column-header">
-                                {table.getHeaderGroups().map(headerGroup => (
-                                    <TableColumnHeaderRow key={headerGroup.id}>
-                                        <SortableContext
-                                            items={headerGroup.headers.map(header => header.id)}
-                                            strategy={horizontalListSortingStrategy}
-                                        >
-                                            {headerGroup.headers.map(header => (
-                                                <th key={header.id}>
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                                </th>
-                                            ))}
-                                        </SortableContext>
-                                    </TableColumnHeaderRow>
-                                ))}
-                            </thead>
-                            <tbody>
-                                {table.getRowModel().rows.map(row => (
-                                    <React.Fragment key={row.id}>
-                                        <Table2Row key={row.id} row={row as Row<ExpandableRow>}>
-                                            {row.getVisibleCells().map(cell => (
-                                                <td key={cell.id}>
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext())}
-                                                </td>
-                                            ))}
-                                        </Table2Row>
-                                    </React.Fragment> 
-                                ))}
-                            </tbody>
-                        </table>
-                    </DndContext>
+                            <div 
+                                style={{
+                                    height: spacing.table_container_height,
+                                    width: spacing.table_container_width,
+                                    overflow: 'auto',
+                                    backgroundColor: colors.white,
+                                }}
+                            >
+                                <table 
+                                    className="table2"
+                                    style={{
+                                        width: table.getTotalSize(),
+                                    }}
+                                >
+                                    <thead className="sticky-column-header">
+                                        {table.getHeaderGroups().map(headerGroup => (
+                                            <TableColumnHeaderRow key={headerGroup.id}>
+                                                <SortableContext
+                                                    items={headerGroup.headers.map(header => header.id)}
+                                                    strategy={horizontalListSortingStrategy}
+                                                >
+                                                    {headerGroup.headers.map(header => (
+                                                        <th 
+                                                            key={header.id} 
+                                                            style={{
+                                                                width: header.getSize(),
+                                                                position: 'relative',
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                header.column.columnDef.header,
+                                                                header.getContext()
+                                                            )}
+                                                        </th>
+                                                    ))}
+                                                </SortableContext>
+                                            </TableColumnHeaderRow>
+                                        ))}
+                                    </thead>
+                                    <tbody>
+                                        {table.getRowModel().rows.map(row => (
+                                            <React.Fragment key={row.id}>
+                                                <Table2Row key={row.id} row={row as Row<ExpandableRow>}>
+                                                    {row.getVisibleCells().map(cell => (
+                                                        <td key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext())}
+                                                        </td>
+                                                    ))}
+                                                </Table2Row>
+                                            </React.Fragment> 
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </DndContext>
                     </>
                     : <PlaceholderNoResult onClearFilters={handleClearFilters} />
                 }

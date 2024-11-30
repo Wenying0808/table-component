@@ -36,6 +36,7 @@ import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tabl
 // Virtulization
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { colors } from "@/app/styles/colors";
+import { spacing } from "@/app/styles/spacing";
 
 
 export default function Table1Page() {
@@ -143,7 +144,8 @@ export default function Table1Page() {
                 </div>
             ),
             enableResizing: false,
-            size: 48,
+            size: spacing.table_cell_select_width,
+            maxSize: spacing.table_cell_select_width,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -302,7 +304,7 @@ export default function Table1Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: 140,
+            size: spacing.table_cell_actions_width,
         }),
         columnHelper.display({
             id: 'add',
@@ -589,8 +591,8 @@ export default function Table1Page() {
                         <div 
                             ref={tableContainerRef} 
                             style={{ 
-                                height: '70vh', 
-                                width: '80vw', 
+                                height: spacing.table_container_height, 
+                                width: spacing.table_container_width, 
                                 overflow: 'auto',
                                 backgroundColor: colors.white,
                             }}
