@@ -79,11 +79,6 @@ a {
   height: fit-content;
 }
 
-.table1, .table2, .table3 {
-  border-collapse: collapse;
-  width: 100%;
-}
-
 
 @media (max-width: 600px) {
   .table-page {
@@ -97,12 +92,12 @@ a {
 }
 
 table {
-  border: 1px solid gray;
   background-color: white;
   width: 80vw;
   border-radius: 2px;
   border-spacing: 0;
   border-collapse: separate;
+  table-layout: fixed; /*fix the column*/
 }
 
 .sticky-column-header {

@@ -3,10 +3,11 @@ import { useState } from 'react';
 
 interface Table1RowProps {
     children: React.ReactNode;
+    isSelected?: boolean;
     height?: string; //  from virtual rows
 }
 
-export const Table1Row = ({ children, height }: Table1RowProps) => {
+export const Table1Row = ({ children, height, isSelected }: Table1RowProps) => {
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -14,7 +15,11 @@ export const Table1Row = ({ children, height }: Table1RowProps) => {
         fontSize: "14px",
         fontWeight: 500,
         height: height || "42px",
-        backgroundColor: isHovered ? `${colors.linkWater}` : "transparent",
+        backgroundColor: isSelected 
+            ? `${colors.linkWater}` 
+            : isHovered 
+                ? `${colors.linkWater}` 
+                : "transparent",
     };
     
     return (

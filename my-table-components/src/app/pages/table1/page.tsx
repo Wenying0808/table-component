@@ -35,6 +35,8 @@ import { randomStatus, statusProps, randomUser } from "@/app/tableFunctions/tabl
 
 // Virtulization
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { colors } from "@/app/styles/colors";
+import { spacing } from "@/app/styles/spacing";
 
 
 export default function Table1Page() {
@@ -54,8 +56,6 @@ export default function Table1Page() {
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
     const [columnSizing, setColumnSizing] = useState({});
-
-    const basePath = process.env.GITHUB_PATH || ''; 
 
     const {
         columnVisibility,
@@ -125,22 +125,27 @@ export default function Table1Page() {
         columnHelper.display({
             id: 'select',
             header: () => (
-                <Checkbox
-                    checked={data.length > 0 && selectedRows.length === data.length}
-                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
-                    onChange={handleSelectAllRows}
-                    sx={checkboxStyle}
-                />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Checkbox
+                        checked={data.length > 0 && selectedRows.length === data.length}
+                        indeterminate={selectedRows.length > 0 && selectedRows.length < data.length}
+                        onChange={handleSelectAllRows}
+                        sx={checkboxStyle}
+                    />
+                </div>
             ),
             cell: ({ row }) => (
-                <Checkbox
-                    checked={selectedRows.includes(row.original._id!)}
-                    onChange={() => handleRowSelection(row.original._id!)}
-                    sx={checkboxStyle}
-                />
+                <div style={{ display: 'flex', justifyContent: 'center', marginLeft: '20px' }}>
+                    <Checkbox
+                        checked={selectedRows.includes(row.original._id!)}
+                        onChange={() => handleRowSelection(row.original._id!)}
+                        sx={checkboxStyle}
+                    />
+                </div>
             ),
             enableResizing: false,
-            size: 50,
+            size: spacing.table_column_select_size,
+            maxSize: spacing.table_column_select_size,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -299,7 +304,7 @@ export default function Table1Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: 120,
+            size: spacing.table_column_actions_size,
         }),
         columnHelper.display({
             id: 'add',
@@ -311,7 +316,8 @@ export default function Table1Page() {
             ),
             enableHiding: false,
             enableResizing: false,
-            size: 50,
+            size: spacing.table_column_add_size,
+            maxSize: spacing.table_column_add_size,
         })
     ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
@@ -332,9 +338,9 @@ export default function Table1Page() {
         onColumnVisibilityChange: setColumnVisibility,
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
-            size: 200, 
-            minSize: 50, 
-            maxSize: 500,
+            size: spacing.table_default_column_size, 
+            minSize: spacing.table_default_column_min_size, 
+            maxSize: spacing.table_default_column_max_size,
             enableResizing: true,
         },
         columnResizeMode: 'onChange' as ColumnResizeMode,
@@ -359,7 +365,7 @@ export default function Table1Page() {
         ? totalHeight - (virtualRows[virtualRows.length - 1].end || 0)
         : 0;
 
-    console.log("virtualRows", virtualRows);
+    /*console.log("virtualRows", virtualRows);*/
 
 
     // data fetching and handling
@@ -391,7 +397,7 @@ export default function Table1Page() {
             }
             
             const queryString = params.toString();
-            const response = await fetch(`${basePath}/pages/api/table1?${queryString}`);
+            const response = await fetch(`/pages/api/table1?${queryString}`);
             const table1 = await response.json();
             /*console.log("Fetched table1 data from db",table1);*/
             setData(table1);
@@ -401,7 +407,7 @@ export default function Table1Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }, [basePath, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
         try {
@@ -414,7 +420,7 @@ export default function Table1Page() {
                 "duration": statusProps.duration,
                 "isArchived": false,
             };
-            const response = await fetch(`${basePath}/pages/api/table1`, {
+            const response = await fetch(`/pages/api/table1`, {
                 method: 'POST',
                 body: JSON.stringify(newData)
             });
@@ -427,7 +433,7 @@ export default function Table1Page() {
         } finally {
             setIsAddingData(false);
         }
-    }, [basePath, handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     // Filter Functions
 
@@ -479,7 +485,7 @@ export default function Table1Page() {
                 ids: selectedRows,
                 action: "archive"
             }
-            const response = await fetch(`${basePath}/pages/api/table1`, {
+            const response = await fetch(`/pages/api/table1`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -493,7 +499,7 @@ export default function Table1Page() {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -502,7 +508,7 @@ export default function Table1Page() {
                 ids: selectedRows,
                 action: "unarchive"
             }
-            const response = await fetch(`${basePath}/pages/api/table1`, {
+            const response = await fetch(`/pages/api/table1`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -516,7 +522,7 @@ export default function Table1Page() {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleClearFilters = useCallback(async () => {
         try { 
@@ -583,8 +589,21 @@ export default function Table1Page() {
                         sensors={sensors}
                         onDragEnd={handleDragEnd}
                     >
-                        <div ref={tableContainerRef} className="table1-container" style={{ height: '70vh', width: '80vw', overflow: 'auto' }}>
-                            <table className="table1" style={{ width: table.getTotalSize() }}>
+                        <div 
+                            ref={tableContainerRef} 
+                            style={{ 
+                                height: spacing.table_container_height, 
+                                width: spacing.table_container_width, 
+                                overflow: 'auto',
+                                backgroundColor: colors.white,
+                            }}
+                        >
+                            <table 
+                                className="table1" 
+                                style={{ 
+                                    width: table.getTotalSize(),
+                                }}
+                            >
                                 <thead className="sticky-column-header">
                                     {table.getHeaderGroups().map(headerGroup => (
                                         <TableColumnHeaderRow key={headerGroup.id}>
@@ -618,6 +637,7 @@ export default function Table1Page() {
                                                 <Table1Row 
                                                     key={row.id} 
                                                     height={`${virtualRow.size}px`}
+                                                    isSelected={selectedRows.includes(row.original._id!)}
                                                 >
                                                     {row.getVisibleCells().map(cell => (
                                                         <td key={cell.id}>
@@ -631,17 +651,6 @@ export default function Table1Page() {
                                             );
                                         })}
                                     <tr style={{ height: `${paddingBottom}px` }} />
-                                    {/*table.getRowModel().rows.map(row => (
-                                        <Table1Row key={row.id}>
-                                            {row.getVisibleCells().map(cell => (
-                                                <td key={cell.id}>
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext())}
-                                                </td>
-                                            ))}
-                                        </Table1Row>
-                                    ))}*/}
                                 </tbody>
                             </table>
                         </div>

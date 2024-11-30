@@ -1,7 +1,30 @@
 "use client";
 
+// React and hooks
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+
+// Third-party libraries
+import { DndContext } from "@dnd-kit/core";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import { Checkbox, SelectChangeEvent } from "@mui/material";
+import { 
+    ColumnResizeMode,
+    createColumnHelper, 
+    flexRender, 
+    getCoreRowModel, 
+    getExpandedRowModel, 
+    getSortedRowModel, 
+    Row, 
+    SortingState, 
+    useReactTable 
+} from "@tanstack/react-table";
+
+// Components
 import Loader from "@/app/components/loader";
 import Navbar from "@/app/components/navbar/navbar";
+import TableControlBar from "@/app/components/TableControlBar";
+
+// Table Components
 import { TableCellActions } from "@/app/components/table/ActionsCell";
 import { AddColumnModal } from "@/app/components/table/AddColumnModal";
 import ColumnHeader from "@/app/components/table/ColumnHeader";
@@ -12,17 +35,23 @@ import { TableCellStatus } from "@/app/components/table/StatusCell";
 import { Table3CellExpand } from "@/app/components/table/Table3CellExpand";
 import { Table3Row } from "@/app/components/table/Table3Row";
 import { TableColumnHeaderRow } from "@/app/components/table/TableColumnHeaderRow";
-import TableControlBar from "@/app/components/TableControlBar";
+
+// Utils and Functions
 import { randomStatus, randomUser, statusProps } from "@/app/tableFunctions/tableAddData/tableAddData";
 import TableColumnsManagement from "@/app/tableFunctions/tableManagement/tableColumnsManagement";
-import { AppTaskAnalysis, FilterParams, StatusFilter, TaskAnalysis, TimeRangeFilter, WorkflowTaskAnalysis } from "@/app/types/DataTypes";
+
+// Types
+import { 
+    AppTaskAnalysis, 
+    FilterParams, 
+    StatusFilter, 
+    TaskAnalysis, 
+    TimeRangeFilter, 
+    WorkflowTaskAnalysis 
+} from "@/app/types/DataTypes";
 import { ExpandableRow } from "@/app/types/TableTypes";
-import { DndContext } from "@dnd-kit/core";
-import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
-import { Checkbox, SelectChangeEvent } from "@mui/material";
-import { createColumnHelper, flexRender, getCoreRowModel, getExpandedRowModel, getSortedRowModel, Row, SortingState, useReactTable } from "@tanstack/react-table";
-import React, { useCallback, useEffect } from "react";
-import { useMemo, useState } from "react";
+import { spacing } from "@/app/styles/spacing";
+import { colors } from "@/app/styles/colors";
 
 export default function Table3Page() {
     const columnHelper = createColumnHelper<WorkflowTaskAnalysis>();
@@ -38,7 +67,7 @@ export default function Table3Page() {
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [isArchivingData, setIsArchivingData] = useState<boolean>(false);
     const [isUnarchivingData, setIsUnarchivingData] = useState<boolean>(false);
-    const basePath = process.env.GITHUB_PATH || ''; 
+    const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
     const {
         columnOrder,
@@ -108,6 +137,9 @@ export default function Table3Page() {
             cell: ({ row }) => <Table3CellExpand row={row as Row<ExpandableRow>} />,
             header: () => <span className="table-header"></span>,
             enableHiding: false,
+            enableResizing: false,
+            size: spacing.table_column_expand_size,
+            maxSize: spacing.table_column_expand_size,
         }),
         columnHelper.display({
             id: 'select',
@@ -128,6 +160,9 @@ export default function Table3Page() {
                     />
                 ) : null
             ),
+            enableResizing: false,
+            size: spacing.table_column_select_size,
+            maxSize: spacing.table_column_select_size,
         }),
         columnHelper.accessor('_id', {
             cell: info => info.getValue(),
@@ -149,41 +184,59 @@ export default function Table3Page() {
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Name
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Name
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),  
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('status', {
             cell: info => <TableCellStatus data={info.getValue()} />,
-            header: ({ column }) => (
-                <ColumnHeader
-                    id={column.id}
-                    isSortable={true}
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Status
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader
+                        id={header.column.id}
+                        isSortable={true}
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Status
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}   
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
@@ -197,64 +250,94 @@ export default function Table3Page() {
                 >
                     Actions
                 </ColumnHeader>
-            )
+            ),
+            enableResizing: false,
+            size: spacing.table_column_actions_size,
+            maxSize: spacing.table_column_actions_size,
         }),
         columnHelper.accessor('duration', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader
-                    id={column.id}
-                    isSortable={true}
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Duration
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader
+                        id={header.column.id}
+                        isSortable={true}
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Duration
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
         columnHelper.accessor('user', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true}
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    User
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true}
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        User
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
         }),
         columnHelper.accessor('updatedTime', {
             cell: info => info.getValue(),
-            header: ({ column }) => (
-                <ColumnHeader 
-                    id={column.id}
-                    isSortable={true} 
-                    sortingState={column.getIsSorted()}
-                    columnIsRemoveable={true}
-                    handleSorting={() => {
-                        column.toggleSorting();
-                    }}
-                    handleRemoveColumn={() => {
-                        handleRemoveColumn(column.id);
-                    }}
-                >
-                    Updated Time
-                </ColumnHeader>
+            header: ({ header }) => (
+                <div className="resizable-header">
+                    <ColumnHeader 
+                        id={header.column.id}
+                        isSortable={true} 
+                        sortingState={header.column.getIsSorted()}
+                        columnIsRemoveable={true}
+                        handleSorting={() => {
+                            header.column.toggleSorting();
+                        }}
+                        handleRemoveColumn={() => {
+                            handleRemoveColumn(header.column.id);
+                        }}
+                    >
+                        Updated Time
+                    </ColumnHeader>
+                    {header.column.getCanResize() && (
+                        <div
+                            className="resizer"
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                        />
+                    )}
+                </div>
             ),
             sortingFn: 'alphanumeric',
         }),
@@ -267,6 +350,9 @@ export default function Table3Page() {
                 />
             ),
             enableHiding: false,
+            enableResizing: false,
+            size: spacing.table_column_add_size,
+            maxSize: spacing.table_column_add_size,
         })
     ], [columnHelper, handleRemoveColumn, setIsAddColumnModalOpen, selectedRows, data, handleRowSelection, handleSelectAllRows])
 
@@ -293,10 +379,20 @@ export default function Table3Page() {
             sorting,
             columnVisibility,
             columnOrder,
+            columnSizing,
         },
         onSortingChange: setSorting,
         onColumnVisibilityChange: setColumnVisibility,
         onColumnOrderChange: setColumnOrder,
+        onColumnSizingChange: setColumnSizing,
+        defaultColumn: {
+            size: spacing.table_default_column_size, 
+            minSize: spacing.table_default_column_min_size, 
+            maxSize: spacing.table_default_column_max_size,
+            enableResizing: true,
+        },
+        columnResizeMode: 'onChange' as ColumnResizeMode,
+        enableColumnResizing: true,
     });
     
     const handleFetchData = useCallback(async (filters: FilterParams = {
@@ -325,7 +421,7 @@ export default function Table3Page() {
                 params.append('isArchived', filters.isArchived.toString());
             } 
             const queryString = params.toString();
-            const response = await fetch(`${basePath}/pages/api/table3?${queryString}`);
+            const response = await fetch(`/pages/api/table3?${queryString}`);
             const table3Data = await response.json();
             setData(table3Data);
         } catch (error) {
@@ -333,7 +429,7 @@ export default function Table3Page() {
         } finally {
             setIsDataLoading(false);
         }
-    }, [basePath, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleAddData = useCallback(async () => {
         try{
@@ -367,7 +463,7 @@ export default function Table3Page() {
 
             console.log("newData:", newData);
 
-            const response = await fetch(`${basePath}/pages/api/table3`, {
+            const response = await fetch(`/pages/api/table3`, {
                 method: 'POST',
                 body: JSON.stringify(newData)
             });
@@ -380,7 +476,7 @@ export default function Table3Page() {
         } finally {
             setIsAddingData(false);
         }
-    }, [basePath, handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleNameSearch = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
@@ -440,7 +536,7 @@ export default function Table3Page() {
                 ids: selectedRows,
                 action: "archive"
             }
-            const response = await fetch(`${basePath}/pages/api/table3`, {
+            const response = await fetch(`/pages/api/table3`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -460,7 +556,7 @@ export default function Table3Page() {
             setIsArchivingData(false);
             setSelectedRows([]);
         }
-    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
 
     const handleUnarchiveSelectedRows = useCallback(async () => {
         try{
@@ -469,7 +565,7 @@ export default function Table3Page() {
                 ids: selectedRows,
                 action: "unarchive"
             }
-            const response = await fetch(`${basePath}/pages/api/table3`, {
+            const response = await fetch(`/pages/api/table3`, {
                 method: 'PATCH',
                 body: JSON.stringify(requestBody)
             });
@@ -483,7 +579,7 @@ export default function Table3Page() {
             setIsUnarchivingData(false);
             setSelectedRows([]);
         }
-    }, [basePath, handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
+    }, [handleFetchData, selectedRows, nameFilter, statusFilter, userFilter, timeRangeFilter, isArchivedFilter]);
     
     const handleClearFilters = useCallback(async () => {
         try { 
@@ -546,44 +642,64 @@ export default function Table3Page() {
                                 onAddColumns={handleAddColumns}
                             />
                             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-                                <table className="table3">
-                                    <thead className="sticky-column-header">
-                                        {table.getHeaderGroups().map(headerGroup => (
-                                            <TableColumnHeaderRow key={headerGroup.id}>
-                                                <SortableContext 
-                                                    items={headerGroup.headers.map(header => header.id)}
-                                                    strategy={horizontalListSortingStrategy}
-                                                >
-                                                    {headerGroup.headers.map(header => (
-                                                        <th key={header.id}>
-                                                            {flexRender(
-                                                                header.column.columnDef.header,
-                                                                header.getContext()
+                                <div 
+                                    style={{
+                                        height: spacing.table_container_height,
+                                        width: spacing.table_container_width,
+                                        overflow: 'auto',
+                                        backgroundColor: colors.white,
+                                    }}
+                                >
+                                    <table 
+                                        className="table3" 
+                                        style={{
+                                            width: table.getTotalSize(),
+                                        }}
+                                    >
+                                        <thead className="sticky-column-header">
+                                            {table.getHeaderGroups().map(headerGroup => (
+                                                <TableColumnHeaderRow key={headerGroup.id}>
+                                                    <SortableContext 
+                                                        items={headerGroup.headers.map(header => header.id)}
+                                                        strategy={horizontalListSortingStrategy}
+                                                    >
+                                                        {headerGroup.headers.map(header => (
+                                                            <th 
+                                                                key={header.id}
+                                                                style={{
+                                                                    width: header.getSize(),
+                                                                    position: 'relative',
+                                                                }}
+                                                            >
+                                                                {flexRender(
+                                                                    header.column.columnDef.header,
+                                                                    header.getContext()
+                                                                )}
+                                                            </th>
+                                                        ))}
+                                                    </SortableContext>
+                                                </TableColumnHeaderRow>
+                                            ))}
+                                                
+                                        </thead>
+                                        <tbody>
+                                            {table.getRowModel().rows.map(row => (
+                                                <React.Fragment key={row.id}>
+                                                    <Table3Row key={row.id} row={row as Row<ExpandableRow>}>
+                                                        {row.getVisibleCells().map(cell => (
+                                                            <td key={cell.id}>
+                                                                {flexRender(
+                                                                    cell.column.columnDef.cell,
+                                                                    cell.getContext()
                                                             )}
-                                                        </th>
-                                                    ))}
-                                                </SortableContext>
-                                            </TableColumnHeaderRow>
-                                        ))}
-                                            
-                                    </thead>
-                                    <tbody>
-                                        {table.getRowModel().rows.map(row => (
-                                            <React.Fragment key={row.id}>
-                                                <Table3Row key={row.id} row={row as Row<ExpandableRow>}>
-                                                    {row.getVisibleCells().map(cell => (
-                                                        <td key={cell.id}>
-                                                            {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext()
-                                                        )}
-                                                    </td>
-                                                    ))}
-                                                </Table3Row>
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                                        </td>
+                                                        ))}
+                                                    </Table3Row>
+                                                </React.Fragment>
+                                            ))}
+                                            </tbody>
+                                    </table>
+                                </div>
                             </DndContext>
                         </>
                     : <PlaceholderNoResult onClearFilters={handleClearFilters} />}
