@@ -149,16 +149,16 @@ export default function Table2Page() {
                 ) : null
             ),
             enableResizing: false,
-            size: spacing.table_cell_select_width,
-            maxSize: spacing.table_cell_select_width,
+            size: spacing.table_column_select_size,
+            maxSize: spacing.table_column_select_size,
         }),
         columnHelper.display({
             id: 'expand',
             cell: ({ row }) => <Table2CellExpand row={row as Row<ExpandableRow>} />,
             header: () => <span className="table-header"></span>,
             enableResizing: false,
-            size: spacing.table_cell_expand_width,
-            maxSize: spacing.table_cell_expand_width,
+            size: spacing.table_column_expand_size,
+            maxSize: spacing.table_column_expand_size,
         }),
         columnHelper.accessor('_id', {
             cell: info => info.getValue(),
@@ -277,7 +277,7 @@ export default function Table2Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: spacing.table_cell_actions_width,
+            size: spacing.table_column_actions_size,
         }),
         columnHelper.accessor('user', {
             cell: info => info.getValue(),
@@ -342,6 +342,9 @@ export default function Table2Page() {
                 />
             ),
             enableHiding: false,
+            enableResizing: false,
+            size: spacing.table_column_add_size,
+            maxSize: spacing.table_column_add_size,
         })
     ], [selectedRows, data, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen, handleSelectAllRows, handleRowSelection]);
 
@@ -370,9 +373,9 @@ export default function Table2Page() {
         onColumnOrderChange: setColumnOrder,
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
-            size: 200, 
-            minSize: 120, 
-            maxSize: 500,
+            size: spacing.table_default_column_size, 
+            minSize: spacing.table_default_column_min_size, 
+            maxSize: spacing.table_default_column_max_size,
             enableResizing: true,
         },
         columnResizeMode: 'onChange' as ColumnResizeMode,

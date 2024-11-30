@@ -144,8 +144,8 @@ export default function Table1Page() {
                 </div>
             ),
             enableResizing: false,
-            size: spacing.table_cell_select_width,
-            maxSize: spacing.table_cell_select_width,
+            size: spacing.table_column_select_size,
+            maxSize: spacing.table_column_select_size,
         }),
         columnHelper.accessor('name', {
             cell: info => info.getValue(),
@@ -304,7 +304,7 @@ export default function Table1Page() {
                 </ColumnHeader>
             ),
             enableResizing: false,
-            size: spacing.table_cell_actions_width,
+            size: spacing.table_column_actions_size,
         }),
         columnHelper.display({
             id: 'add',
@@ -316,7 +316,8 @@ export default function Table1Page() {
             ),
             enableHiding: false,
             enableResizing: false,
-            size: 100,
+            size: spacing.table_column_add_size,
+            maxSize: spacing.table_column_add_size,
         })
     ], [selectedRows, data, handleSelectAllRows, handleRowSelection, columnHelper, handleRemoveColumn, setIsAddColumnModalOpen]);
 
@@ -337,9 +338,9 @@ export default function Table1Page() {
         onColumnVisibilityChange: setColumnVisibility,
         onColumnSizingChange: setColumnSizing,
         defaultColumn: {
-            size: 200, 
-            minSize: 120, 
-            maxSize: 500,
+            size: spacing.table_default_column_size, 
+            minSize: spacing.table_default_column_min_size, 
+            maxSize: spacing.table_default_column_max_size,
             enableResizing: true,
         },
         columnResizeMode: 'onChange' as ColumnResizeMode,
