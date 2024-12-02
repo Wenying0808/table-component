@@ -32,7 +32,7 @@ export default function Home() {
           <Grid2 size="grow">
             <Paper sx={PaperStyle}>
               <Typography variant="h5" gutterBottom>
-                Basic Data Display
+                Table Data Display
               </Typography>
               <Typography variant="body1" gutterBottom>
                 A simple table component that displays data in a clean, organized format. Features include:
@@ -67,7 +67,7 @@ export default function Home() {
                   <ListItemIcon>
                     <CircleIcon sx={CircleIconStyle} />
                   </ListItemIcon>
-                  <ListItemText primary="Expand/collapse nestedrows" />
+                  <ListItemText primary="Expand / Collapse nestedrows" />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
@@ -79,19 +79,19 @@ export default function Home() {
                   <ListItemIcon>
                     <CircleIcon sx={CircleIconStyle} />
                   </ListItemIcon>
-                  <ListItemText primary="Search/filter capabilities" />
+                  <ListItemText primary="Search / Filter capabilities" />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <CircleIcon sx={CircleIconStyle} />
                   </ListItemIcon>
-                  <ListItemText primary="Add/remove columns" />
+                  <ListItemText primary="Add / Remove columns" />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <CircleIcon sx={CircleIconStyle} />
                   </ListItemIcon>
-                  <ListItemText primary="Reorder columns" />
+                  <ListItemText primary="Reorder / Resize columns" />
                 </ListItem>
               </List>
             </Paper>
